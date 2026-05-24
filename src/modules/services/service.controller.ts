@@ -70,7 +70,12 @@ export class ServiceController {
 
       const data = updateServiceSchema.parse(req.body);
 
-      const result = await this.serviceService.update(id, data);
+      const result = await this.serviceService.update(id, {
+        ...data,
+        ...(req.file && {
+          image_path: req.file.path,
+        }),
+      });
 
       res.status(200).json(result);
     } catch (error) {

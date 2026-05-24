@@ -15,7 +15,7 @@ const serviceRoutes = (
 
   routes.get("/:id", serviceController.getServiceById);
 
-  routes.patch("/:id", serviceController.updateService);
+  routes.patch("/:id", serviceUpload.single("image"), serviceController.updateService);
 
   routes.delete("/:id", serviceController.deleteService);
 

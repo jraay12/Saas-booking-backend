@@ -34,16 +34,16 @@ export const createServiceSchema = z.object({
     .max(59, "Minute must not exceed 59"),
 });
 
-export const updateServiceSchema =
-  createServiceSchema.partial();
+export const updateServiceSchema = createServiceSchema
+  .partial()
+  .extend({
+    image_path: z.string().optional(),
+  });
 
-type CreateServiceBodyDTO =
-  z.infer<typeof createServiceSchema>;
+type CreateServiceBodyDTO = z.infer<typeof createServiceSchema>;
 
-export type CreateServiceDTO =
-  CreateServiceBodyDTO & {
-    image_path: string;
-  };
+export type CreateServiceDTO = CreateServiceBodyDTO & {
+  image_path: string;
+};
 
-export type UpdateServiceDTO =
-  z.infer<typeof updateServiceSchema>;
+export type UpdateServiceDTO = z.infer<typeof updateServiceSchema>;

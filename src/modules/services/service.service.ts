@@ -1,8 +1,12 @@
 import { NotFoundError } from "../../shared/errors/NotFoundError";
 import { ServiceRepository } from "./service.repository";
 import { Prisma } from "@prisma/client";
-import { CreateServiceDTO, UpdateServiceDTO } from "./validation/service.validation";
-
+import {
+  CreateServiceDTO,
+  UpdateServiceDTO,
+} from "./validation/service.validation";
+import fs from "fs";
+import path from "path";
 export class ServiceService {
   constructor(private serviceRepo: ServiceRepository) {}
 
@@ -34,8 +38,20 @@ export class ServiceService {
     return service;
   }
 
-  async update(id: string, data: UpdateServiceDTO) {
-    await this.findById(id);
+  async update(id: string, data: UpdateServiceDTO & { image_path?: string }) {
+    const existingService = await this.findById(id);
+
+    const uploadDir = path.join(process.cwd(), "public", "services");
+    // delete old image if new one is provided
+    if (data.image_path && existingService?.image_path) {
+      const filename = path.basename(existingService.image_path);
+
+      const oldImagePath = path.join(uploadDir, filename);
+
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+    }
 
     const payload: Prisma.ServiceUpdateInput = {
       ...(data.service_name && {
@@ -60,6 +76,11 @@ export class ServiceService {
 
       ...(data.minute !== undefined && {
         minute: data.minute,
+      }),
+
+      // image update
+      ...(data.image_path && {
+        image_path: data.image_path,
       }),
     };
 
