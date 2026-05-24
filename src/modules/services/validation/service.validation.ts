@@ -18,27 +18,32 @@ export const createServiceSchema = z.object({
     .max(255, "Description must not exceed 255 characters")
     .optional(),
 
-  price: z
-    .number("Price must be a number")
+  price: z.coerce
+    .number()
     .min(0, "Price must be greater than or equal to 0"),
 
-  hour: z
-    .number("Hour must be a number")
+  hour: z.coerce
+    .number()
     .int("Hour must be an integer")
     .min(0, "Hour must be greater than or equal to 0"),
 
-  minute: z
-    .number("Minute must be a number")
+  minute: z.coerce
+    .number()
     .int("Minute must be an integer")
     .min(0, "Minute must be greater than or equal to 0")
     .max(59, "Minute must not exceed 59"),
-
-  image_path: z
-    .string()
-    .min(1, "Image path is required"),
 });
 
-export const updateServiceSchema = createServiceSchema.partial();
+export const updateServiceSchema =
+  createServiceSchema.partial();
 
-export type CreateServiceDTO = z.infer<typeof createServiceSchema>;
-export type UpdateServiceDTO = z.infer<typeof updateServiceSchema>;
+type CreateServiceBodyDTO =
+  z.infer<typeof createServiceSchema>;
+
+export type CreateServiceDTO =
+  CreateServiceBodyDTO & {
+    image_path: string;
+  };
+
+export type UpdateServiceDTO =
+  z.infer<typeof updateServiceSchema>;

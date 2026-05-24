@@ -61,10 +61,6 @@ export class ServiceService {
       ...(data.minute !== undefined && {
         minute: data.minute,
       }),
-
-      ...(data.image_path && {
-        image_path: data.image_path,
-      }),
     };
 
     return await this.serviceRepo.update(id, payload);

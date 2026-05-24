@@ -2,13 +2,14 @@
 
 import { Router } from "express";
 import { ServiceController } from "./service.controller";
+import { serviceUpload } from "../../lib/multer";
 
 const serviceRoutes = (
   serviceController: ServiceController,
 ): Router => {
   const routes = Router();
 
-  routes.post("/", serviceController.createService);
+  routes.post("/" , serviceUpload.single("image"), serviceController.createService);
 
   routes.get("/", serviceController.getServices);
 
