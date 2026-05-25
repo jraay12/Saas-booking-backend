@@ -6,8 +6,15 @@ import authRoutes from "./modules/auth/auth.routes";
 import { serviceController, userController, authController, staffController } from "./container";
 import staffRoutes from "./modules/staff/staff.routes";
 import path from "node:path";
+import cors from "cors"
 const app = express();
 
+const corsOptions = {
+  origin: "http://localhost:5173/",
+  method: ["GET", "POST", "PATCH", "DELETE"]
+}
+
+app.use(cors(corsOptions))
 app.use(express.json());
 app.use("/public", express.static(path.join(process.cwd(), "public")));
 app.use("/api/v1/service", serviceRoutes(serviceController));
