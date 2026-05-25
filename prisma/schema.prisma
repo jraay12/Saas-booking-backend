@@ -58,6 +58,8 @@ model Business {
   business_name    String
   category         String
 
+  slug             String   @unique
+
   description      String?
 
   logo             String?
