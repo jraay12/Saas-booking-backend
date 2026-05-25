@@ -27,3 +27,7 @@ const createStorage = (folder: string) => {
 export const serviceUpload = multer({
   storage: createStorage("services"),
 });
+
+export const avatarUpload = multer({
+  storage: createStorage("avatar"),
+});
