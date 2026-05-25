@@ -1,0 +1,25 @@
+import { PrismaClient as PrismaClientType, Prisma } from "@prisma/client";
+
+type PrismaTx = Prisma.TransactionClient;
+
+export class UserRepository {
+  constructor(private prisma: PrismaClientType) {}
+
+  async create(data: Prisma.UserCreateInput, tx?: PrismaTx) {
+    const client = tx ?? this.prisma;
+
+    return await client.user.create({
+      data,
+    });
+  }
+
+  async findByEmail(email: string, tx?: PrismaTx) {
+    const client = tx ?? this.prisma;
+
+    return await client.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+}

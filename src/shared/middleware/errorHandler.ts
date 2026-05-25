@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import { UnAuthorized } from "../errors/UnAuthorized";
 import { ForbbidenError } from "../errors/ForbiddenError";
 import { NotFoundError } from "../errors/NotFoundError";
+import { ConflictError } from "../errors/ConflictError";
 export const errorHandler = (
   err: Error,
   req: Request,
@@ -28,11 +29,11 @@ export const errorHandler = (
     });
   }
 
-  // if (err instanceof ConflictError){
-  //   return res.status(409).json({
-  //     error: err.message
-  //   })
-  // }
+  if (err instanceof ConflictError){
+    return res.status(409).json({
+      error: err.message
+    })
+  }
 
   if (err instanceof ForbbidenError){
     return res.status(403).json({
