@@ -43,7 +43,7 @@ export const updateServiceSchema = createServiceSchema
 type CreateServiceBodyDTO = z.infer<typeof createServiceSchema>;
 
 export type CreateServiceDTO = CreateServiceBodyDTO & {
-  image_path: string;
+  image_path?: string | null;
   business_id: string
 };
 

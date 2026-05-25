@@ -3,11 +3,13 @@
 import { Router } from "express";
 import { ServiceController } from "./service.controller";
 import { upload } from "../../lib/multer";
+import { authMiddleware } from "../../shared/middleware/authMiddleware";
 const serviceRoutes = (serviceController: ServiceController): Router => {
   const routes = Router();
 
   routes.post(
     "/",
+    authMiddleware,
     upload.fields([{ name: "image", maxCount: 1 }]),
     serviceController.createService,
   );
@@ -22,7 +24,7 @@ const serviceRoutes = (serviceController: ServiceController): Router => {
     serviceController.updateService,
   );
 
-  routes.delete("/:id", serviceController.deleteService);
+  routes.delete("/:id",  serviceController.deleteService);
 
   return routes;
 };

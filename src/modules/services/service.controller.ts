@@ -8,33 +8,50 @@ import {
   createServiceSchema,
   updateServiceSchema,
 } from "./validation/service.validation";
+import { AuthRequest } from "../../shared/middleware/authMiddleware";
 
 export class ServiceController {
   constructor(private serviceService: ServiceService) {}
 
-  createService = async (req: Request, res: Response, next: NextFunction) => {
+  createService = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const data = createServiceSchema.parse(req.body);
-      const mockBusinessId = "cmpklv4kh0001f4livjf52pxi"
 
-      if (!req.file)
-        return res.status(400).json({
-          error: "No file uploaded",
-        });
+      const business_id = req.user?.businessId;
+
+      if (!business_id) {
+        return res.status(403).json({ message: "Business not found in token" });
+      }
+
+      const files = req.files as
+        | { [fieldname: string]: Express.Multer.File[] }
+        | undefined;
+
+      const imageFile = files?.image?.[0];
 
       const result = await this.serviceService.create({
         ...data,
-        image_path: req.file.path,
-        business_id: mockBusinessId
+        image_path: imageFile?.path ?? null, // ✅ optional now
+        business_id,
       });
 
-      res.status(201).json(result);
+      return res.status(201).json(result);
     } catch (error) {
-      if (req.file) {
-        try {
-          await fs.unlink(req.file.path);
+      const files = req.files as
+        | { [fieldname: string]: Express.Multer.File[] }
+        | undefined;
 
-          console.log("Rolled back file:", req.file.filename);
+      const imageFile = files?.image?.[0];
+
+      // cleanup uploaded file on error
+      if (imageFile) {
+        try {
+          await fs.unlink(imageFile.path);
+          console.log("Rolled back file:", imageFile.filename);
         } catch (fsErr) {
           console.error(fsErr);
         }
