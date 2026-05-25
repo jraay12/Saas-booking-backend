@@ -1,14 +1,16 @@
 import { Router } from "express";
 
 import { UserController } from "./user.controller";
-import { avatarUpload } from "../../lib/multer";
+import { upload } from "../../lib/multer";
 
 const userRoutes = (
   userController: UserController,
 ): Router => {
   const routes = Router();
 
-  routes.post("/", avatarUpload.single("image"), userController.createUser);
+  routes.post("/", upload.fields([
+    {name: "avatar", maxCount: 1}
+  ]), userController.createUser);
 
   return routes;
 };

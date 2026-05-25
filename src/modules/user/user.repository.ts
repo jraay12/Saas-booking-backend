@@ -22,4 +22,14 @@ export class UserRepository {
       },
     });
   }
+
+  async findByPhone(phone?: string, tx?: PrismaTx) {
+    const client = tx ?? this.prisma;
+
+    return await client.user.findUnique({
+      where: {
+        phone,
+      },
+    });
+  }
 }

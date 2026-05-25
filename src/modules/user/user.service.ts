@@ -10,19 +10,17 @@ export class UserService {
   constructor(private userRepo: UserRepository) {}
 
   async create(data: CreateUserDTO, tx?: Prisma.TransactionClient) {
-    const existingUser = await this.userRepo.findByEmail(
-      data.email,
-      tx,
-    );
+    const existingUser = await this.userRepo.findByEmail(data.email, tx);
 
     if (existingUser) {
       throw new ConflictError("User already exists");
     }
 
-    const hashedPassword = await bcrypt.hash(
-      data.password,
-      10,
-    );
+    if (data.phone) {
+      await this.findByPhone(data.phone);
+    }
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
 
     const payload: Prisma.UserCreateInput = {
       first_name: data.first_name,
@@ -32,6 +30,9 @@ export class UserService {
       ...(data.phone && {
         phone: data.phone,
       }),
+      ...(data.avatar && {
+        avatar: data.avatar
+      })
     };
 
     return await this.userRepo.create(payload, tx);
@@ -39,5 +40,13 @@ export class UserService {
 
   async findByEmail(email: string, tx?: Prisma.TransactionClient) {
     return await this.userRepo.findByEmail(email, tx);
+  }
+
+  async findByPhone(phone?: string, tx?: Prisma.TransactionClient) {
+    const existingPhone = await this.userRepo.findByPhone(phone, tx);
+
+    if (existingPhone) throw new ConflictError("Phone already exists");
+
+    return existingPhone;
   }
 }

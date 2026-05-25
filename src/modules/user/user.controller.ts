@@ -20,7 +20,7 @@ export class UserController {
         ...data,
 
         ...(req.file && {
-          avatar: `/public/avatars/${req.file.filename}`,
+          avatar: `/public/avatar/${req.file.filename}`,
         }),
       });
 

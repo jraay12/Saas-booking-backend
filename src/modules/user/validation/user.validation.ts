@@ -22,4 +22,6 @@ export const createUserSchema = z.object({
   phone: z.string().optional(),
 });
 
-export type CreateUserDTO = z.infer<typeof createUserSchema>;
+export type CreateUserDTO = z.infer<typeof createUserSchema> & {
+  avatar?: string
+};
