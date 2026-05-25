@@ -8,25 +8,17 @@ import { CreateMembershipDTO } from "./validation/membership.validation";
 import { ForbbidenError } from "../../shared/errors/ForbiddenError";
 
 export class MembershipService {
-  constructor(
-    private membershipRepo: MembershipRepository,
-  ) {}
+  constructor(private membershipRepo: MembershipRepository) {}
 
-  async create(
-    data: CreateMembershipDTO,
-    tx?: Prisma.TransactionClient,
-  ) {
-    const existingMembership =
-      await this.membershipRepo.findByUserAndBusiness(
-        data.user_id,
-        data.business_id,
-        tx,
-      );
+  async create(data: CreateMembershipDTO, tx?: Prisma.TransactionClient) {
+    const existingMembership = await this.membershipRepo.findByUserAndBusiness(
+      data.user_id,
+      data.business_id,
+      tx,
+    );
 
     if (existingMembership) {
-      throw new ConflictError(
-        "Membership already exists",
-      );
+      throw new ConflictError("Membership already exists");
     }
 
     const payload: Prisma.MembershipCreateInput = {
@@ -45,21 +37,18 @@ export class MembershipService {
       },
     };
 
-    return await this.membershipRepo.create(
-      payload,
-      tx,
-    );
+    return await this.membershipRepo.create(payload, tx);
   }
 
   async assertStaffMember(
     user_id: string,
     business_id: string,
-    tx?: Prisma.TransactionClient
+    tx?: Prisma.TransactionClient,
   ) {
     const membership = await this.membershipRepo.findByUserAndBusiness(
       user_id,
       business_id,
-      tx
+      tx,
     );
 
     if (!membership) {
@@ -71,5 +60,9 @@ export class MembershipService {
     }
 
     return membership;
+  }
+
+  async findAllMembers(business_id: string) {
+    return await this.membershipRepo.findAllMembers(business_id);
   }
 }

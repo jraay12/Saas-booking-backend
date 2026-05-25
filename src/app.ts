@@ -3,27 +3,33 @@ import { errorHandler } from "./shared/middleware/errorHandler";
 import serviceRoutes from "./modules/services/service.route";
 import userRoutes from "./modules/user/user.routes";
 import authRoutes from "./modules/auth/auth.routes";
-import { serviceController, userController, authController, staffController } from "./container";
+import membershipRoutes from "./modules/membership/membership.routes";
+import {
+  serviceController,
+  userController,
+  authController,
+  staffController,
+  membershipController,
+} from "./container";
 import staffRoutes from "./modules/staff/staff.routes";
 import path from "node:path";
-import cors, { CorsOptions } from "cors"
+import cors, { CorsOptions } from "cors";
 const app = express();
 
 const corsOptions: CorsOptions = {
- origin: ['http://localhost:5173', 'https://jraay12.github.io'],
- methods: ['GET', 'POST', 'PUT', 'DELETE', "PATCH"],
- credentials: true,
-}
+  origin: ["http://localhost:5173", "https://jraay12.github.io"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true,
+};
 
-app.use(cors(corsOptions))
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/public", express.static(path.join(process.cwd(), "public")));
 app.use("/api/v1/service", serviceRoutes(serviceController));
 app.use("/api/v1/user", userRoutes(userController));
 app.use("/api/v1/auth", authRoutes(authController));
 app.use("/api/v1/staff", staffRoutes(staffController));
-
-
+app.use("/api/v1/membership", membershipRoutes(membershipController));
 
 app.use(errorHandler);
 

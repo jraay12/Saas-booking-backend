@@ -30,11 +30,7 @@ export class MembershipRepository {
     });
   }
 
-  async findStaffMember(
-    user_id: string,
-    business_id: string,
-    tx?: PrismaTx
-  ) {
+  async findStaffMember(user_id: string, business_id: string, tx?: PrismaTx) {
     const client = tx ?? this.prisma;
 
     return await client.membership.findFirst({
@@ -48,5 +44,26 @@ export class MembershipRepository {
       },
     });
   }
-  
+
+  async findAllMembers(business_id: string, tx?: PrismaTx) {
+    const client = tx ?? this.prisma;
+
+    return await client.membership.findMany({
+      where: {
+        business_id,
+        role: "STAFF",
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            avatar: true,
+            email: true,
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+    });
+  }
 }
