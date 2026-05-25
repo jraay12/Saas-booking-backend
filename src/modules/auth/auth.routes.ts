@@ -27,6 +27,8 @@ const authRoutes = (
     authController.register,
   );
 
+  routes.post("/login", authController.login)
+
   return routes;
 };
 

@@ -34,6 +34,14 @@ export const registerSchema = z.object({
   address: z.string().optional(),
 });
 
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email format"),
+
+  password: z.string().min(1, "Password is required"),
+});
+
+export type LoginDTO = z.infer<typeof loginSchema>;
+
 export type RegisterDTO =
   z.infer<typeof registerSchema> & {
     avatar?: string;

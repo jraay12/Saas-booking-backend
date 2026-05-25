@@ -20,6 +20,13 @@ export class UserRepository {
       where: {
         email,
       },
+      include: {
+        memberships: {
+          include: {
+            business: true,
+          },
+        },
+      },
     });
   }
 

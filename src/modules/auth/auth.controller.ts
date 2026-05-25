@@ -8,7 +8,7 @@ import fs from "node:fs/promises";
 
 import { AuthService } from "./auth.service";
 
-import { registerSchema } from "./validation/auth.validation";
+import { loginSchema, registerSchema } from "./validation/auth.validation";
 
 export class AuthController {
   constructor(
@@ -99,4 +99,20 @@ export class AuthController {
       next(error);
     }
   };
+
+  login = async(req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = loginSchema.parse(
+        req.body,
+      );
+
+      const result = await this.authService.login(data)
+      res.status(200).json({
+        message: "Successfully loggedIn",
+        token: result.token
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
