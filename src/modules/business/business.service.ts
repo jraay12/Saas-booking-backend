@@ -17,49 +17,59 @@ export class BusinessService {
     data: CreateBusinessDTO,
     tx?: Prisma.TransactionClient,
   ) {
-    const slug = slugify(data.business_name, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
+    const baseSlug = slugify(
+      data.business_name,
+      {
+        lower: true,
+        strict: true,
+        trim: true,
+      },
+    );
 
-    const existingBusiness =
+    let slug = baseSlug;
+
+    let counter = 1;
+
+    // check if slug already exists
+    while (
       await this.businessRepo.findBySlug(
         slug,
         tx,
-      );
+      )
+    ) {
+      slug = `${baseSlug}-${counter}`;
 
-    if (existingBusiness) {
-      throw new ConflictError(
-        "Business slug already exists",
-      );
+      counter++;
     }
 
-    const payload: Prisma.BusinessCreateInput = {
-      business_name: data.business_name,
-      slug,
-      category: data.category,
+    const payload: Prisma.BusinessCreateInput =
+      {
+        business_name: data.business_name,
 
-      ...(data.description && {
-        description: data.description,
-      }),
+        slug,
 
-      ...(data.email && {
-        email: data.email,
-      }),
+        category: data.category,
 
-      ...(data.phone && {
-        phone: data.phone,
-      }),
+        ...(data.description && {
+          description: data.description,
+        }),
 
-      ...(data.address && {
-        address: data.address,
-      }),
+        ...(data.email && {
+          email: data.email,
+        }),
 
-      ...(data.logo && {
-        logo: data.logo,
-      }),
-    };
+        ...(data.phone && {
+          phone: data.phone,
+        }),
+
+        ...(data.address && {
+          address: data.address,
+        }),
+
+        ...(data.logo && {
+          logo: data.logo,
+        }),
+      };
 
     return await this.businessRepo.create(
       payload,
@@ -72,7 +82,10 @@ export class BusinessService {
     tx?: Prisma.TransactionClient,
   ) {
     const business =
-      await this.businessRepo.findById(id, tx);
+      await this.businessRepo.findById(
+        id,
+        tx,
+      );
 
     if (!business) {
       throw new NotFoundError(
