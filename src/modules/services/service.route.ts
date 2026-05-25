@@ -2,20 +2,25 @@
 
 import { Router } from "express";
 import { ServiceController } from "./service.controller";
-import { serviceUpload } from "../../lib/multer";
-
-const serviceRoutes = (
-  serviceController: ServiceController,
-): Router => {
+import { upload } from "../../lib/multer";
+const serviceRoutes = (serviceController: ServiceController): Router => {
   const routes = Router();
 
-  routes.post("/" , serviceUpload.single("image"), serviceController.createService);
+  routes.post(
+    "/",
+    upload.fields([{ name: "image", maxCount: 1 }]),
+    serviceController.createService,
+  );
 
   routes.get("/", serviceController.getServices);
 
   routes.get("/:id", serviceController.getServiceById);
 
-  routes.patch("/:id", serviceUpload.single("image"), serviceController.updateService);
+  routes.patch(
+    "/:id",
+    upload.fields([{ name: "image", maxCount: 1 }]),
+    serviceController.updateService,
+  );
 
   routes.delete("/:id", serviceController.deleteService);
 

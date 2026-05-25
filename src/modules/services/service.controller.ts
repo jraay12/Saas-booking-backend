@@ -16,13 +16,14 @@ export class ServiceController {
     try {
       const data = createServiceSchema.parse(req.body);
 
-      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-
-      const filePath = req.file.filename;
+      if (!req.file)
+        return res.status(400).json({
+          error: "No file uploaded",
+        });
 
       const result = await this.serviceService.create({
         ...data,
-        image_path: `/public/services/${filePath}`,
+        image_path: req.file.path,
       });
 
       res.status(201).json(result);
@@ -30,14 +31,13 @@ export class ServiceController {
       if (req.file) {
         try {
           await fs.unlink(req.file.path);
-          console.log(
-            "Successfully rolled back orphaned file:",
-            req.file.filename,
-          );
+
+          console.log("Rolled back file:", req.file.filename);
         } catch (fsErr) {
-          console.error("Failed to delete orphaned file:", fsErr);
+          console.error(fsErr);
         }
       }
+
       next(error);
     }
   };
