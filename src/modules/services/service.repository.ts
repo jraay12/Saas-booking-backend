@@ -48,4 +48,33 @@ export class ServiceRepository {
       },
     });
   }
+
+  async assign(data: Prisma.ServiceStaffCreateInput, tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return await client.serviceStaff.create({
+      data,
+    });
+  }
+
+  async findByServiceAndStaff(service_id: string, staff_id: string, tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return await client.serviceStaff.findFirst({
+      where: {
+        service_id,
+        staff_id,
+      },
+    });
+  }
+
+  
+  async remove(service_id: string, staff_id: string) {
+    return await this.prisma.serviceStaff.deleteMany({
+      where: {
+        service_id,
+        staff_id,
+      },
+    });
+  }
 }

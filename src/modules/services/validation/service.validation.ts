@@ -18,9 +18,7 @@ export const createServiceSchema = z.object({
     .max(255, "Description must not exceed 255 characters")
     .optional(),
 
-  price: z.coerce
-    .number()
-    .min(0, "Price must be greater than or equal to 0"),
+  price: z.coerce.number().min(0, "Price must be greater than or equal to 0"),
 
   hour: z.coerce
     .number()
@@ -34,17 +32,23 @@ export const createServiceSchema = z.object({
     .max(59, "Minute must not exceed 59"),
 });
 
-export const updateServiceSchema = createServiceSchema
-  .partial()
-  .extend({
-    image_path: z.string().optional(),
-  });
+export const updateServiceSchema = createServiceSchema.partial().extend({
+  image_path: z.string().optional(),
+});
 
 type CreateServiceBodyDTO = z.infer<typeof createServiceSchema>;
 
 export type CreateServiceDTO = CreateServiceBodyDTO & {
   image_path?: string | null;
-  business_id: string
+  business_id: string;
 };
 
 export type UpdateServiceDTO = z.infer<typeof updateServiceSchema>;
+
+export const assignStaffSchema = z.object({
+  service_id: z.string().min(1, "Service ID is required"),
+  staff_id: z.string().min(1, "Staff ID is required"),
+  business_id: z.string().optional(),
+});
+
+export type AssignStaffDTO = z.infer<typeof assignStaffSchema>;

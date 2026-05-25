@@ -26,6 +26,10 @@ const serviceRoutes = (serviceController: ServiceController): Router => {
 
   routes.delete("/:id",  serviceController.deleteService);
 
+  routes.post("/assign", authMiddleware, serviceController.assignStaff)
+
+  routes.post("/remove", authMiddleware, serviceController.removeStaff)
+
   return routes;
 };
 

@@ -1,17 +1,11 @@
-import {
-  PrismaClient as PrismaClientType,
-  Prisma,
-} from "@prisma/client";
+import { PrismaClient as PrismaClientType, Prisma } from "@prisma/client";
 
 type PrismaTx = Prisma.TransactionClient;
 
 export class MembershipRepository {
   constructor(private prisma: PrismaClientType) {}
 
-  async create(
-    data: Prisma.MembershipCreateInput,
-    tx?: PrismaTx,
-  ) {
+  async create(data: Prisma.MembershipCreateInput, tx?: PrismaTx) {
     const client = tx ?? this.prisma;
 
     return await client.membership.create({
@@ -35,4 +29,24 @@ export class MembershipRepository {
       },
     });
   }
+
+  async findStaffMember(
+    user_id: string,
+    business_id: string,
+    tx?: PrismaTx
+  ) {
+    const client = tx ?? this.prisma;
+
+    return await client.membership.findFirst({
+      where: {
+        user_id,
+        business_id,
+        role: "STAFF",
+      },
+      include: {
+        user: true,
+      },
+    });
+  }
+  
 }

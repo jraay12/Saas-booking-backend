@@ -21,12 +21,13 @@ const membershipRepository = new MembershipRepository(prisma)
 const businessRepository = new BusinessRepository(prisma)
 
 // service
-const serviceService = new ServiceService(serviceRepo)
+
 const userService = new UserService(userRepository)
 const  membershipService = new MembershipService(membershipRepository)
 const businessService = new BusinessService(businessRepository)
 const authService = new AuthService(prisma, userService, businessService, membershipService, userRepository)
 const staffService = new StaffService(userService, membershipService, prisma)
+const serviceService = new ServiceService(serviceRepo, membershipService)
 // controller 
 
 export const serviceController = new ServiceController(serviceService)

@@ -32,6 +32,7 @@ model User {
 
   // relations
   memberships   Membership[]
+  serviceStaff ServiceStaff[]
 }
 
 model Membership {
@@ -100,4 +101,22 @@ model Service {
   updatedAt   DateTime @updatedAt
 
   business      Business @relation(fields: [business_id], references: [id])
+
+  serviceStaff ServiceStaff[]
+}
+
+model ServiceStaff {
+  id         String @id @default(cuid())
+
+  service_id String
+  staff_id   String
+  business_id String
+
+  service    Service @relation(fields: [service_id], references: [id], onDelete: Cascade)
+  staff      User    @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+
+  @@unique([service_id, staff_id])
+  @@index([business_id])
 }

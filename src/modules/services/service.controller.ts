@@ -5,6 +5,7 @@ import { ServiceService } from "./service.service";
 import fs from "node:fs/promises";
 
 import {
+  assignStaffSchema,
   createServiceSchema,
   updateServiceSchema,
 } from "./validation/service.validation";
@@ -109,6 +110,34 @@ export class ServiceController {
       const result = await this.serviceService.delete(id);
 
       res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  assignStaff = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const data = assignStaffSchema.parse(req.body);
+      const business_id = req.user?.businessId!;
+      const result = await this.serviceService.assignStaffToService({
+        ...data,
+        business_id: business_id,
+      });
+
+      return res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  removeStaff = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const data = assignStaffSchema.parse(req.body);
+      const business_id = req.user?.businessId!
+      const result = await this.serviceService.removeStaffFromService(data, business_id);
+      return res.json(200).json({
+        message: "Successfully remove",
+      });
     } catch (error) {
       next(error);
     }

@@ -2,13 +2,19 @@ import { NotFoundError } from "../../shared/errors/NotFoundError";
 import { ServiceRepository } from "./service.repository";
 import { Prisma } from "@prisma/client";
 import {
+  AssignStaffDTO,
   CreateServiceDTO,
   UpdateServiceDTO,
 } from "./validation/service.validation";
 import fs from "fs";
 import path from "path";
+import { ConflictError } from "../../shared/errors/ConflictError";
+import { MembershipService } from "../membership/membership.service";
 export class ServiceService {
-  constructor(private serviceRepo: ServiceRepository) {}
+  constructor(
+    private serviceRepo: ServiceRepository,
+    private membershipService: MembershipService,
+  ) {}
 
   async create(data: CreateServiceDTO) {
     const payload: Prisma.ServiceCreateInput = {
@@ -22,8 +28,8 @@ export class ServiceService {
       business: {
         connect: {
           id: data.business_id,
-        }
-      }
+        },
+      },
     };
 
     return await this.serviceRepo.create(payload);
@@ -96,5 +102,38 @@ export class ServiceService {
     await this.findById(id);
 
     return await this.serviceRepo.delete(id);
+  }
+
+  async assignStaffToService(data: AssignStaffDTO) {
+    await this.findById(data.service_id);
+
+    await this.membershipService.assertStaffMember(
+      data.staff_id,
+      data.business_id!,
+    );
+
+    const existing = await this.serviceRepo.findByServiceAndStaff(
+      data.service_id,
+      data.staff_id,
+    );
+
+    if (existing) {
+      throw new ConflictError("Staff already assigned to this service");
+    }
+
+    return await this.serviceRepo.assign({
+      business_id: data.business_id!,
+      service: {
+        connect: { id: data.service_id },
+      },
+      staff: {
+        connect: { id: data.staff_id },
+      },
+    });
+  }
+
+  // TO BE IMPROVED THE LOGIC
+  async removeStaffFromService(data: AssignStaffDTO, business_id: string) {
+    return await this.serviceRepo.remove(data.service_id, data.staff_id);
   }
 }

@@ -5,6 +5,7 @@ import { ConflictError } from "../../shared/errors/ConflictError";
 import { MembershipRepository } from "./membership.repository";
 
 import { CreateMembershipDTO } from "./validation/membership.validation";
+import { ForbbidenError } from "../../shared/errors/ForbiddenError";
 
 export class MembershipService {
   constructor(
@@ -48,5 +49,27 @@ export class MembershipService {
       payload,
       tx,
     );
+  }
+
+  async assertStaffMember(
+    user_id: string,
+    business_id: string,
+    tx?: Prisma.TransactionClient
+  ) {
+    const membership = await this.membershipRepo.findByUserAndBusiness(
+      user_id,
+      business_id,
+      tx
+    );
+
+    if (!membership) {
+      throw new ForbbidenError("User is not a member of this business");
+    }
+
+    if (membership.role !== Role.STAFF) {
+      throw new ForbbidenError("User is not a staff member");
+    }
+
+    return membership;
   }
 }
