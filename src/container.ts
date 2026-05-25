@@ -10,6 +10,8 @@ import { BusinessRepository } from "./modules/business/business.repository";
 import { BusinessService } from "./modules/business/business.service";
 import { AuthController } from "./modules/auth/auth.controller";
 import { AuthService } from "./modules/auth/auth.service";
+import { StaffService } from "./modules/staff/staff.service";
+import StaffController from "./modules/staff/staff.controller";
 import { prisma } from "./lib/prisma";
 
 // repository
@@ -24,8 +26,10 @@ const userService = new UserService(userRepository)
 const  membershipService = new MembershipService(membershipRepository)
 const businessService = new BusinessService(businessRepository)
 const authService = new AuthService(prisma, userService, businessService, membershipService, userRepository)
+const staffService = new StaffService(userService, membershipService, prisma)
 // controller 
 
 export const serviceController = new ServiceController(serviceService)
 export const userController = new UserController(userService)
 export const authController = new AuthController(authService)
+export const staffController = new StaffController(staffService)

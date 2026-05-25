@@ -3,7 +3,8 @@ import { errorHandler } from "./shared/middleware/errorHandler";
 import serviceRoutes from "./modules/services/service.route";
 import userRoutes from "./modules/user/user.routes";
 import authRoutes from "./modules/auth/auth.routes";
-import { serviceController, userController, authController } from "./container";
+import { serviceController, userController, authController, staffController } from "./container";
+import staffRoutes from "./modules/staff/staff.routes";
 import path from "node:path";
 const app = express();
 
@@ -12,6 +13,9 @@ app.use("/public", express.static(path.join(process.cwd(), "public")));
 app.use("/api/v1/service", serviceRoutes(serviceController));
 app.use("/api/v1/user", userRoutes(userController));
 app.use("/api/v1/auth", authRoutes(authController));
+app.use("/api/v1/staff", staffRoutes(staffController));
+
+
 
 app.use(errorHandler);
 
