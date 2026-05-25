@@ -6,12 +6,13 @@ import authRoutes from "./modules/auth/auth.routes";
 import { serviceController, userController, authController, staffController } from "./container";
 import staffRoutes from "./modules/staff/staff.routes";
 import path from "node:path";
-import cors from "cors"
+import cors, { CorsOptions } from "cors"
 const app = express();
 
-const corsOptions = {
-  origin: "http://localhost:5173/",
-  method: ["GET", "POST", "PATCH", "DELETE"]
+const corsOptions: CorsOptions = {
+ origin: ['http://localhost:5173', 'https://jraay12.github.io'],
+ methods: ['GET', 'POST', 'PUT', 'DELETE', "PATCH"],
+ credentials: true,
 }
 
 app.use(cors(corsOptions))
