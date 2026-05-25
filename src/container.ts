@@ -4,16 +4,20 @@ import { ServiceService } from "./modules/services/service.service";
 import { UserService } from "./modules/user/user.service";
 import { UserController } from "./modules/user/user.controller";
 import { UserRepository } from "./modules/user/user.repository";
+import { MembershipRepository } from "./modules/membership/membership.repository";
+import { MembershipService } from "./modules/membership/membership.service";
 import { prisma } from "./lib/prisma";
 
 // repository
 const serviceRepo = new ServiceRepository(prisma)
 const userRepository = new UserRepository(prisma)
+const membershipRepository = new MembershipRepository(prisma)
 
 
 // service
 const serviceService = new ServiceService(serviceRepo)
 const userService = new UserService(userRepository)
+const  membershipService = new MembershipService(membershipRepository)
 
 // controller 
 
