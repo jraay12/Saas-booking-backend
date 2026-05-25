@@ -60,7 +60,7 @@ model Business {
 
   slug             String   @unique
 
-  description      String?
+  description String? @db.Text
 
   logo             String?
 

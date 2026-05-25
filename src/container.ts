@@ -8,6 +8,8 @@ import { MembershipRepository } from "./modules/membership/membership.repository
 import { MembershipService } from "./modules/membership/membership.service";
 import { BusinessRepository } from "./modules/business/business.repository";
 import { BusinessService } from "./modules/business/business.service";
+import { AuthController } from "./modules/auth/auth.controller";
+import { AuthService } from "./modules/auth/auth.service";
 import { prisma } from "./lib/prisma";
 
 // repository
@@ -21,7 +23,9 @@ const serviceService = new ServiceService(serviceRepo)
 const userService = new UserService(userRepository)
 const  membershipService = new MembershipService(membershipRepository)
 const businessService = new BusinessService(businessRepository)
+const authService = new AuthService(prisma, userService, businessService, membershipService)
 // controller 
 
 export const serviceController = new ServiceController(serviceService)
 export const userController = new UserController(userService)
+export const authController = new AuthController(authService)

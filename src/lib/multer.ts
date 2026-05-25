@@ -1,33 +1,41 @@
-import multer from "multer"
+import multer from "multer";
 import path from "node:path";
 import fs from "node:fs";
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    let folder = "uploads";
 
-const createStorage = (folder: string) => {
-  return multer.diskStorage({
-    destination: function (_req, _file, cb) {
-      const dir = `./public/${folder}`;
+    // decide folder based on field name
+    switch (file.fieldname) {
+      case "avatar":
+        folder = "avatar";
+        break;
 
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
+      case "logo":
+        folder = "business-logo";
+        break;
 
-      cb(null, dir);
-    },
+      case "image":
+        folder = "services";
+        break;
+    }
 
-    filename: function (_req, file, cb) {
-      const uniqueName =
-        Date.now() + path.extname(file.originalname);
+    const dir = `./public/${folder}`;
 
-      cb(null, uniqueName);
-    },
-  });
-};
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
 
-export const serviceUpload = multer({
-  storage: createStorage("services"),
+    cb(null, dir);
+  },
+
+  filename: function (_req, file, cb) {
+    const uniqueName =
+      Date.now() + path.extname(file.originalname);
+
+    cb(null, uniqueName);
+  },
 });
 
-export const avatarUpload = multer({
-  storage: createStorage("avatar"),
-});
+export const upload = multer({ storage });
