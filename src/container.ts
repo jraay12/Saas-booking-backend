@@ -24,7 +24,7 @@ const businessRepository = new BusinessRepository(prisma)
 // service
 
 const userService = new UserService(userRepository)
-const  membershipService = new MembershipService(membershipRepository)
+const  membershipService = new MembershipService(membershipRepository, serviceRepo, prisma)
 const businessService = new BusinessService(businessRepository)
 const authService = new AuthService(prisma, userService, businessService, membershipService, userRepository)
 const staffService = new StaffService(userService, membershipService, prisma)

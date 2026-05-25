@@ -49,7 +49,10 @@ export class ServiceRepository {
     });
   }
 
-  async assign(data: Prisma.ServiceStaffCreateInput, tx?: Prisma.TransactionClient) {
+  async assign(
+    data: Prisma.ServiceStaffCreateInput,
+    tx?: Prisma.TransactionClient,
+  ) {
     const client = tx ?? this.prisma;
 
     return await client.serviceStaff.create({
@@ -57,7 +60,11 @@ export class ServiceRepository {
     });
   }
 
-  async findByServiceAndStaff(service_id: string, staff_id: string, tx?: Prisma.TransactionClient) {
+  async findByServiceAndStaff(
+    service_id: string,
+    staff_id: string,
+    tx?: Prisma.TransactionClient,
+  ) {
     const client = tx ?? this.prisma;
 
     return await client.serviceStaff.findFirst({
@@ -68,12 +75,33 @@ export class ServiceRepository {
     });
   }
 
-  
-  async remove(service_id: string, staff_id: string) {
-    return await this.prisma.serviceStaff.deleteMany({
+  async remove(
+    service_id: string,
+    staff_id: string,
+    business_id: string,
+    tx?: PrismaTx,
+  ) {
+    const client = tx ?? this.prisma;
+    return await client.serviceStaff.deleteMany({
       where: {
         service_id,
         staff_id,
+        business_id,
+      },
+    });
+  }
+
+  async removeAllByStaff(
+    user_id: string,
+    business_id: string,
+    tx?: PrismaTx,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return await client.serviceStaff.deleteMany({
+      where: {
+        staff_id: user_id,
+        business_id,
       },
     });
   }

@@ -134,6 +134,6 @@ export class ServiceService {
 
   // TO BE IMPROVED THE LOGIC
   async removeStaffFromService(data: AssignStaffDTO, business_id: string) {
-    return await this.serviceRepo.remove(data.service_id, data.staff_id);
+    return await this.serviceRepo.remove(data.service_id, data.staff_id, business_id);
   }
 }

@@ -66,4 +66,16 @@ export class MembershipRepository {
       },
     });
   }
+
+  async removeStaffMember(user_id: string, business_id: string, tx?: PrismaTx) {
+    const client = tx ?? this.prisma;
+
+    return await client.membership.deleteMany({
+      where: {
+        user_id,
+        business_id,
+        role: "STAFF",
+      },
+    });
+  }
 }

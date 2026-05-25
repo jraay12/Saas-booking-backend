@@ -15,6 +15,12 @@ const membershipRoutes = (
     membershipController.findAllMembers,
   );
 
+  routes.delete(
+    "/:user_id",
+    authMiddleware,
+    membershipController.removeStaff,
+  );
+
   return routes;
 };
 
