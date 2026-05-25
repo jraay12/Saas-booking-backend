@@ -32,15 +32,6 @@ export const createBusinessSchema = z.object({
   phone: z.string().optional(),
 
   address: z.string().optional(),
-
-  slug: z
-  .string()
-  .min(3)
-  .max(100)
-  .regex(
-    /^[a-z0-9-]+$/,
-    "Slug must be lowercase and hyphenated"
-  )
 });
 
 export type CreateBusinessDTO =
