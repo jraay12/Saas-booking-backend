@@ -11,6 +11,75 @@ datasource db {
   provider = "mysql"
 }
 
+model User {
+  id            String   @id @default(cuid())
+
+  first_name    String
+  last_name     String
+
+  email         String   @unique
+  password      String
+
+  avatar        String?
+
+  phone         String?  @unique
+
+  is_active     Boolean  @default(true)
+  is_verified   Boolean  @default(false)
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  // relations
+  memberships   Membership[]
+}
+
+model Membership {
+  id            String   @id @default(cuid())
+
+  user_id       String
+  business_id   String
+
+  role          Role
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  // relations
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  business      Business @relation(fields: [business_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, business_id])
+}
+
+model Business {
+  id               String   @id @default(cuid())
+
+  business_name    String
+  category         String
+
+  description      String?
+
+  logo             String?
+
+  email            String?
+  phone            String?
+
+  address          String?
+
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  // relations
+  memberships      Membership[]
+
+}
+
+enum Role {
+  OWNER
+  STAFF
+}
+
 
 model Service {
   id    String @id @default(cuid())
