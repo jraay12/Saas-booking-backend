@@ -44,6 +44,7 @@ type CreateServiceBodyDTO = z.infer<typeof createServiceSchema>;
 
 export type CreateServiceDTO = CreateServiceBodyDTO & {
   image_path: string;
+  business_id: string
 };
 
 export type UpdateServiceDTO = z.infer<typeof updateServiceSchema>;

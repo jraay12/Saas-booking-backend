@@ -15,6 +15,7 @@ export class ServiceController {
   createService = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = createServiceSchema.parse(req.body);
+      const mockBusinessId = "cmpklv4kh0001f4livjf52pxi"
 
       if (!req.file)
         return res.status(400).json({
@@ -24,6 +25,7 @@ export class ServiceController {
       const result = await this.serviceService.create({
         ...data,
         image_path: req.file.path,
+        business_id: mockBusinessId
       });
 
       res.status(201).json(result);

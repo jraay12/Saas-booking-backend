@@ -19,6 +19,11 @@ export class ServiceService {
       hour: data.hour,
       minute: data.minute,
       image_path: data.image_path,
+      business: {
+        connect: {
+          id: data.business_id,
+        }
+      }
     };
 
     return await this.serviceRepo.create(payload);
