@@ -134,6 +134,16 @@ export class ServiceService {
 
   // TO BE IMPROVED THE LOGIC
   async removeStaffFromService(data: AssignStaffDTO, business_id: string) {
-    return await this.serviceRepo.remove(data.service_id, data.staff_id, business_id);
+    return await this.serviceRepo.remove(
+      data.service_id,
+      data.staff_id,
+      business_id,
+    );
+  }
+
+  async toggleStatus(id: string, businessId: string, user_id: string) {
+    await this.membershipService.assertOwner(user_id, businessId);
+
+    return this.serviceRepo.toggleStatus(id, businessId);
   }
 }

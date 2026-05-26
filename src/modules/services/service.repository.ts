@@ -1,4 +1,5 @@
 import { PrismaClient as PrismaClientType, Prisma } from "@prisma/client";
+import { NotFoundError } from "../../shared/errors/NotFoundError";
 
 type PrismaTx = Prisma.TransactionClient;
 
@@ -101,6 +102,29 @@ export class ServiceRepository {
       where: {
         staff_id: user_id,
         business_id,
+      },
+    });
+  }
+
+  async toggleStatus(id: string, businessId: string, tx?: PrismaTx) {
+    const client = tx ?? this.prisma;
+
+    const currentToggleState = await client.service.findFirst({
+      where: {
+        id,
+        business_id: businessId,
+      },
+    });
+
+    if (!currentToggleState) throw new NotFoundError("Service not found");
+
+    return await client.service.update({
+      where: {
+        id,
+        business_id: businessId,
+      },
+      data: {
+        is_active: !currentToggleState.is_active,
       },
     });
   }

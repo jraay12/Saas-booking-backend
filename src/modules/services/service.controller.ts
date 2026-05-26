@@ -146,4 +146,29 @@ export class ServiceController {
       next(error);
     }
   };
+
+  toggleStatus = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { id } = req.params as { id: string };
+      const business_id = req.user?.businessId!;
+      const userId = req.user?.userId!;
+      const result = await this.serviceService.toggleStatus(
+        id,
+        business_id,
+        userId,
+      );
+      return res.status(200).json({
+        message: result.is_active
+          ? "Successfully activated"
+          : "Successfully inactivated",
+        is_active: result.is_active,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

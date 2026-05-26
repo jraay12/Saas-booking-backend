@@ -68,6 +68,28 @@ export class MembershipService {
     return membership;
   }
 
+  async assertOwner(
+    user_id: string,
+    business_id: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const membership = await this.membershipRepo.findByUserAndBusiness(
+      user_id,
+      business_id,
+      tx,
+    );
+
+    if (!membership) {
+      throw new ForbbidenError("User is not a member of this business");
+    }
+
+    if (membership.role !== Role.OWNER) {
+      throw new ForbbidenError("User is not the Owner");
+    }
+
+    return membership;
+  }
+
   async findAllMembers(business_id: string) {
     return await this.membershipRepo.findAllMembers(business_id);
   }

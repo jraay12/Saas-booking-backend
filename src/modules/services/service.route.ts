@@ -30,6 +30,8 @@ const serviceRoutes = (serviceController: ServiceController): Router => {
 
   routes.post("/remove", authMiddleware, serviceController.removeStaff);
 
+  routes.post("/:id/toggle-status", authMiddleware, serviceController.toggleStatus)
+
   return routes;
 };
 
