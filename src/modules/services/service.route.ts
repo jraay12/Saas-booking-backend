@@ -14,7 +14,7 @@ const serviceRoutes = (serviceController: ServiceController): Router => {
     serviceController.createService,
   );
 
-  routes.get("/", serviceController.getServices);
+  routes.get("/", authMiddleware, serviceController.getServices);
 
   routes.get("/:id", serviceController.getServiceById);
 
@@ -24,11 +24,11 @@ const serviceRoutes = (serviceController: ServiceController): Router => {
     serviceController.updateService,
   );
 
-  routes.delete("/:id",  serviceController.deleteService);
+  routes.delete("/:id", serviceController.deleteService);
 
-  routes.post("/assign", authMiddleware, serviceController.assignStaff)
+  routes.post("/assign", authMiddleware, serviceController.assignStaff);
 
-  routes.post("/remove", authMiddleware, serviceController.removeStaff)
+  routes.post("/remove", authMiddleware, serviceController.removeStaff);
 
   return routes;
 };

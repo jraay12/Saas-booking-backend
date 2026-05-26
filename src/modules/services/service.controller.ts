@@ -62,9 +62,10 @@ export class ServiceController {
     }
   };
 
-  getServices = async (_req: Request, res: Response, next: NextFunction) => {
+  getServices = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const result = await this.serviceService.findAll();
+      const businessId = req.user?.businessId;
+      const result = await this.serviceService.findAll(businessId!);
 
       res.status(200).json(result);
     } catch (error) {
@@ -133,8 +134,11 @@ export class ServiceController {
   removeStaff = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const data = assignStaffSchema.parse(req.body);
-      const business_id = req.user?.businessId!
-      const result = await this.serviceService.removeStaffFromService(data, business_id);
+      const business_id = req.user?.businessId!;
+      const result = await this.serviceService.removeStaffFromService(
+        data,
+        business_id,
+      );
       return res.json(200).json({
         message: "Successfully remove",
       });

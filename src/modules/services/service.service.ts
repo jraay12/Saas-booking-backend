@@ -35,8 +35,8 @@ export class ServiceService {
     return await this.serviceRepo.create(payload);
   }
 
-  async findAll() {
-    return await this.serviceRepo.findAll();
+  async findAll(businessId: string) {
+    return await this.serviceRepo.findAll(businessId);
   }
 
   async findById(id: string) {

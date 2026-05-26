@@ -20,8 +20,11 @@ export class ServiceRepository {
     });
   }
 
-  async findAll() {
+  async findAll(businessId: string) {
     return await this.prisma.service.findMany({
+      where: {
+        business_id: businessId,
+      },
       orderBy: {
         createdAt: "desc",
       },
@@ -91,11 +94,7 @@ export class ServiceRepository {
     });
   }
 
-  async removeAllByStaff(
-    user_id: string,
-    business_id: string,
-    tx?: PrismaTx,
-  ) {
+  async removeAllByStaff(user_id: string, business_id: string, tx?: PrismaTx) {
     const client = tx ?? this.prisma;
 
     return await client.serviceStaff.deleteMany({
