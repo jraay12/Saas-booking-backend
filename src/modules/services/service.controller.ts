@@ -91,10 +91,16 @@ export class ServiceController {
 
       const data = updateServiceSchema.parse(req.body);
 
+      const files = req.files as {
+        [fieldname: string]: Express.Multer.File[];
+      };
+
+      const image = files?.image?.[0];
+
       const result = await this.serviceService.update(id, {
         ...data,
-        ...(req.file && {
-          image_path: req.file.path,
+        ...(image && {
+          image_path: image.path,
         }),
       });
 
