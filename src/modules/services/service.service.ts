@@ -186,4 +186,10 @@ export class ServiceService {
 
     return this.serviceRepo.toggleStatus(id, businessId);
   }
+
+  async findAllAssignedStaffService(service_id: string, business_id: string) {
+    await this.findById(service_id);
+
+    return await this.serviceRepo.findAllAssignedStaff(service_id, business_id);
+  }
 }
