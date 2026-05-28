@@ -67,6 +67,25 @@ export class MembershipRepository {
     });
   }
 
+  async findStaffMembersByIds(staffIds: string[], business_id: string) {
+    return await this.prisma.membership.findMany({
+      where: {
+        user_id: {
+          in: staffIds,
+        },
+        business_id,
+      },
+      include: {
+        user: {
+          select: {
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+    });
+  }
+
   async removeStaffMember(user_id: string, business_id: string, tx?: PrismaTx) {
     const client = tx ?? this.prisma;
 
