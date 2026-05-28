@@ -30,6 +30,11 @@ export const createServiceSchema = z.object({
     .int("Minute must be an integer")
     .min(0, "Minute must be greater than or equal to 0")
     .max(59, "Minute must not exceed 59"),
+  staffIds: z
+    .string()
+    .transform((val) => JSON.parse(val))
+    .pipe(z.array(z.string()))
+    .optional(),
 });
 
 export const updateServiceSchema = createServiceSchema.partial().extend({
