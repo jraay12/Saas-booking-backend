@@ -29,7 +29,9 @@ export class ServiceService {
       );
 
       if (members.length > 0) {
-        throw new BadRequestError(`Some users are not staff members of the business`);
+        throw new BadRequestError(
+          `Some users are not staff members of the business`,
+        );
       }
     }
 
@@ -121,40 +123,62 @@ export class ServiceService {
   }
 
   async assignStaffToService(data: AssignStaffDTO) {
-    await this.findById(data.service_id);
-
-    await this.membershipService.assertStaffMember(
-      data.staff_id,
+    const service = await this.serviceRepo.findByServiceBusinessId(
+      data.service_id,
       data.business_id!,
     );
 
-    const existing = await this.serviceRepo.findByServiceAndStaff(
-      data.service_id,
-      data.staff_id,
+    if (!service) {
+      throw new BadRequestError("Service does not belong to this business");
+    }
+
+    const nonMembers = await this.membershipService.findMembersByIds(
+      data.staff_ids,
+      data.business_id!,
     );
 
-    if (existing) {
-      throw new ConflictError("Staff already assigned to this service");
+    if (nonMembers.length > 0) {
+      throw new BadRequestError(
+        `${
+          nonMembers.length === 1 ? "This user is" : "Some users are"
+        } not staff members of the business`,
+      );
+    }
+
+    const existingStaffsInService =
+      await this.serviceRepo.findByServiceAndStaff(
+        data.service_id,
+        data.staff_ids,
+      );
+
+    const existingStaffIds = new Set(
+      existingStaffsInService.map((item) => item.staff_id),
+    );
+
+    const alreadyAssignedStaffs = data.staff_ids.filter((id) =>
+      existingStaffIds.has(id),
+    );
+
+    if (alreadyAssignedStaffs.length > 0) {
+      throw new ConflictError(
+        `${
+          alreadyAssignedStaffs.length === 1
+            ? "This staff is"
+            : "Some staff are"
+        } already assigned to this service`,
+      );
     }
 
     return await this.serviceRepo.assign({
-      business_id: data.business_id!,
-      service: {
-        connect: { id: data.service_id },
-      },
-      staff: {
-        connect: { id: data.staff_id },
-      },
+      businessId: data.business_id!,
+      serviceId: data.service_id,
+      staffIds: data.staff_ids,
     });
   }
 
   // TO BE IMPROVED THE LOGIC
   async removeStaffFromService(data: AssignStaffDTO, business_id: string) {
-    return await this.serviceRepo.remove(
-      data.service_id,
-      data.staff_id,
-      business_id,
-    );
+    return await this.serviceRepo.remove(data.service_id, "1", business_id);
   }
 
   async toggleStatus(id: string, businessId: string, user_id: string) {
