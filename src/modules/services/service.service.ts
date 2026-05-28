@@ -11,10 +11,12 @@ import path from "path";
 import { ConflictError } from "../../shared/errors/ConflictError";
 import { MembershipService } from "../membership/membership.service";
 import { BadRequestError } from "../../shared/errors/BadRequestError";
+import { MembershipRepository } from "../membership/membership.repository";
 export class ServiceService {
   constructor(
     private serviceRepo: ServiceRepository,
     private membershipService: MembershipService,
+    private memberRepo: MembershipRepository,
   ) {}
 
   async create(
@@ -191,5 +193,23 @@ export class ServiceService {
     await this.findById(service_id);
 
     return await this.serviceRepo.findAllAssignedStaff(service_id, business_id);
+  }
+
+  async getUnassignedStaffs(service_id: string, business_id: string) {
+    await this.findById(service_id);
+
+    const [assignedStaffs, allStaffMembers] = await Promise.all([
+      this.serviceRepo.findAllAssignedStaff(service_id, business_id),
+
+      this.memberRepo.findAllMembers(business_id),
+    ]);
+
+    const assignedStaffIds = new Set(
+      assignedStaffs.map((item) => item.staff_id),
+    );
+
+    return allStaffMembers.filter(
+      (item) => !assignedStaffIds.has(item.user_id),
+    );
   }
 }
