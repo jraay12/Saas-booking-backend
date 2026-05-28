@@ -157,4 +157,24 @@ export class ServiceRepository {
       },
     });
   }
+
+  async findAllAssignedStaff(service_id: string, business_id: string) {
+    return await this.prisma.serviceStaff.findMany({
+      where: {
+        business_id,
+        service_id,
+      },
+      include: {
+        staff: {
+          select: {
+            id: true,
+            avatar: true,
+            email: true,
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+    });
+  }
 }
