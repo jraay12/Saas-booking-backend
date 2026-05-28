@@ -7,6 +7,7 @@ import fs from "node:fs/promises";
 import {
   assignStaffSchema,
   createServiceSchema,
+  removeStaffSchema,
   updateServiceSchema,
 } from "./validation/service.validation";
 import { AuthRequest } from "../../shared/middleware/authMiddleware";
@@ -143,14 +144,15 @@ export class ServiceController {
 
   removeStaff = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const data = assignStaffSchema.parse(req.body);
+      const data = removeStaffSchema.parse(req.body);
       const business_id = req.user?.businessId!;
-      const result = await this.serviceService.removeStaffFromService(
-        data,
+      await this.serviceService.removeStaffFromService(
+        { service_id: data.service_id, staff_id: data.staff_id },
         business_id,
+        
       );
-      return res.json(200).json({
-        message: "Successfully remove",
+      return res.status(200).json({
+        message: "Successfully remove staff",
       });
     } catch (error) {
       next(error);

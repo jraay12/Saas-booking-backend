@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import {
   AssignStaffDTO,
   CreateServiceDTO,
+  RemoveStaffDTO,
   UpdateServiceDTO,
 } from "./validation/service.validation";
 import fs from "fs";
@@ -179,8 +180,12 @@ export class ServiceService {
   }
 
   // TO BE IMPROVED THE LOGIC
-  async removeStaffFromService(data: AssignStaffDTO, business_id: string) {
-    return await this.serviceRepo.remove(data.service_id, "1", business_id);
+  async removeStaffFromService(data: RemoveStaffDTO, business_id: string) {
+    return await this.serviceRepo.remove(
+      data.service_id,
+      data.staff_id,
+      business_id,
+    );
   }
 
   async toggleStatus(id: string, businessId: string, user_id: string) {
