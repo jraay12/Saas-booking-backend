@@ -201,4 +201,24 @@ export class ServiceController {
       next(error);
     }
   };
+
+  getUnassignedStaffs = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { id } = req.params as { id: string };
+      const business_id = req.user?.businessId!;
+
+      const result = await this.serviceService.getUnassignedStaffs(
+        id,
+        business_id,
+      );
+
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
