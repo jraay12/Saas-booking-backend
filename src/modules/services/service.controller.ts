@@ -38,7 +38,7 @@ export class ServiceController {
         ...data,
         image_path: imageFile?.path ?? null, // ✅ optional now
         business_id,
-      });
+      }, business_id, data.staffIds);
 
       return res.status(201).json(result);
     } catch (error) {
