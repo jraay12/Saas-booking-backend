@@ -26,6 +26,8 @@ const serviceRoutes = (serviceController: ServiceController): Router => {
 
   routes.get("/:id/assigned", authMiddleware, serviceController.findAllAssignedStaffService);
 
+   routes.get("/:id/unassigned", authMiddleware, serviceController.getUnassignedStaffs);
+
   routes.delete("/:id", serviceController.deleteService);
 
   routes.post("/assign", authMiddleware, serviceController.assignStaff);
