@@ -52,8 +52,11 @@ export type UpdateServiceDTO = z.infer<typeof updateServiceSchema>;
 
 export const assignStaffSchema = z.object({
   service_id: z.string().min(1, "Service ID is required"),
-  staff_id: z.string().min(1, "Staff ID is required"),
+
+  staff_ids: z
+    .array(z.string().min(1, "Staff ID is required"))
+    .min(1, "At least one staff is required"),
+
   business_id: z.string().optional(),
 });
-
 export type AssignStaffDTO = z.infer<typeof assignStaffSchema>;
