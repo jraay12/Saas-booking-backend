@@ -23,10 +23,9 @@ export class ServiceRepository {
               createMany: {
                 data: staffIds.map((staffId) => ({
                   business_id: businessId,
-                  staff_id: staffId
+                  staff_id: staffId,
                 })),
-                
-              }
+              },
             },
           }),
       },
@@ -74,28 +73,29 @@ export class ServiceRepository {
   }
 
   async assign(
-    data: Prisma.ServiceStaffCreateInput,
+    data: { businessId: string; serviceId: string; staffIds: string[] },
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 
-    return await client.serviceStaff.create({
-      data,
+    return await client.serviceStaff.createMany({
+      data: data.staffIds.map((item) => ({
+        service_id: data.serviceId,
+        business_id: data.businessId,
+        staff_id: item,
+      })),
     });
   }
 
   async findByServiceAndStaff(
     service_id: string,
-    staff_id: string,
+    staff_ids: string[],
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 
-    return await client.serviceStaff.findFirst({
-      where: {
-        service_id,
-        staff_id,
-      },
+    return await client.serviceStaff.findMany({
+      where: { service_id, staff_id: { in: staff_ids } },
     });
   }
 
@@ -145,6 +145,15 @@ export class ServiceRepository {
       },
       data: {
         is_active: !currentToggleState.is_active,
+      },
+    });
+  }
+
+  async findByServiceBusinessId(service_id: string, business_id: string) {
+    return await this.prisma.service.findFirst({
+      where: {
+        id: service_id,
+        business_id: business_id,
       },
     });
   }
