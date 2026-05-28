@@ -10,13 +10,29 @@ import fs from "fs";
 import path from "path";
 import { ConflictError } from "../../shared/errors/ConflictError";
 import { MembershipService } from "../membership/membership.service";
+import { BadRequestError } from "../../shared/errors/BadRequestError";
 export class ServiceService {
   constructor(
     private serviceRepo: ServiceRepository,
     private membershipService: MembershipService,
   ) {}
 
-  async create(data: CreateServiceDTO) {
+  async create(
+    data: CreateServiceDTO,
+    businessId: string,
+    staffIds?: string[],
+  ) {
+    if (staffIds && staffIds.length > 0) {
+      const members = await this.membershipService.findMembersByIds(
+        staffIds,
+        businessId,
+      );
+
+      if (members.length > 0) {
+        throw new BadRequestError(`Some users are not staff members of the business`);
+      }
+    }
+
     const payload: Prisma.ServiceCreateInput = {
       service_name: data.service_name,
       category: data.category,
@@ -32,7 +48,7 @@ export class ServiceService {
       },
     };
 
-    return await this.serviceRepo.create(payload);
+    return await this.serviceRepo.create(payload, businessId, staffIds);
   }
 
   async findAll(businessId: string) {

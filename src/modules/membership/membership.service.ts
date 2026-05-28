@@ -103,4 +103,17 @@ export class MembershipService {
       await this.membershipRepo.removeStaffMember(user_id, business_id, tx);
     });
   }
+
+  async findMembersByIds(staffIds: string[], businessId: string) {
+    const members = await this.membershipRepo.findStaffMembersByIds(
+      staffIds,
+      businessId,
+    );
+
+    const memberIds = new Set(members.map((member) => member.user_id));
+
+    const nonMembers = staffIds.filter((staffId) => !memberIds.has(staffId));
+
+    return nonMembers;
+  }
 }

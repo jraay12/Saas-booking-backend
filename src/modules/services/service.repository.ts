@@ -6,10 +6,30 @@ type PrismaTx = Prisma.TransactionClient;
 export class ServiceRepository {
   constructor(private prisma: PrismaClientType) {}
 
-  async create(data: Prisma.ServiceCreateInput, tx?: PrismaTx) {
+  async create(
+    data: Prisma.ServiceCreateInput,
+    businessId: string,
+    staffIds?: string[],
+    tx?: PrismaTx,
+  ) {
     const client = tx ?? this.prisma;
     return await client.service.create({
-      data,
+      data: {
+        ...data,
+        ...(staffIds &&
+          staffIds.length > 0 &&
+          businessId && {
+            serviceStaff: {
+              createMany: {
+                data: staffIds.map((staffId) => ({
+                  business_id: businessId,
+                  staff_id: staffId
+                })),
+                
+              }
+            },
+          }),
+      },
     });
   }
 
