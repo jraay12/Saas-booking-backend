@@ -34,11 +34,15 @@ export class ServiceController {
 
       const imageFile = files?.image?.[0];
 
-      const result = await this.serviceService.create({
-        ...data,
-        image_path: imageFile?.path ?? null, // ✅ optional now
+      const result = await this.serviceService.create(
+        {
+          ...data,
+          image_path: imageFile?.path ?? null, // ✅ optional now
+          business_id,
+        },
         business_id,
-      }, business_id, data.staffIds);
+        data.staffIds,
+      );
 
       return res.status(201).json(result);
     } catch (error) {
@@ -173,6 +177,26 @@ export class ServiceController {
           : "Successfully inactivated",
         is_active: result.is_active,
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  findAllAssignedStaffService = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { id } = req.params as { id: string };
+      const business_id = req.user?.businessId!;
+
+      const result = await this.serviceService.findAllAssignedStaffService(
+        id,
+        business_id,
+      );
+
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
