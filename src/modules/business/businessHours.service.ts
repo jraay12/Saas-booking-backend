@@ -11,4 +11,8 @@ export class BusinessHoursService {
       ),
     );
   }
+
+  async getBusinessHours(business_id: string) {
+    return await this.businessHoursRepo.findMany(business_id);
+  }
 }

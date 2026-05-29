@@ -42,4 +42,12 @@ export class BusinessHoursRepository {
       },
     });
   }
+
+  async findMany(business_id: string) {
+    return await this.prisma.businessHour.findMany({
+      where: {
+        business_id
+      }
+    })
+  }
 }

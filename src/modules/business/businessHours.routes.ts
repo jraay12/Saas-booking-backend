@@ -10,6 +10,7 @@ const businessHoursRoutes = (
   const routes = Router();
 
   routes.post("/", authMiddleware, businessHoursController.createBusinessHours);
+  routes.get("/", authMiddleware, businessHoursController.getBusinessHours);
 
   return routes;
 };
