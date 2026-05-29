@@ -78,6 +78,7 @@ model Business {
   memberships      Membership[]
 
   service Service[]
+  businessHour BusinessHour[]
 
 }
 
@@ -121,4 +122,34 @@ model ServiceStaff {
 
   @@unique([service_id, staff_id])
   @@index([business_id])
+}
+
+model BusinessHour {
+  id String @id @default(cuid())
+
+  business_id String
+  day         DayOfWeek
+
+  open_time  String // "09:00"
+  close_time String // "18:00"
+
+  is_closed Boolean @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  business Business @relation(fields: [business_id], references: [id], onDelete: Cascade)
+
+  @@unique([business_id, day])
+  @@index([business_id])
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
