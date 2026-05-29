@@ -10,8 +10,10 @@ import {
   authController,
   staffController,
   membershipController,
+  businessHoursController
 } from "./container";
 import staffRoutes from "./modules/staff/staff.routes";
+import businessHoursRoutes from "./modules/business/businessHours.routes";
 import path from "node:path";
 import cors, { CorsOptions } from "cors";
 const app = express();
@@ -30,6 +32,8 @@ app.use("/api/v1/user", userRoutes(userController));
 app.use("/api/v1/auth", authRoutes(authController));
 app.use("/api/v1/staff", staffRoutes(staffController));
 app.use("/api/v1/membership", membershipRoutes(membershipController));
+app.use("/api/v1/business-hours", businessHoursRoutes(businessHoursController));
+
 
 app.use(errorHandler);
 
