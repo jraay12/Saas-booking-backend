@@ -39,4 +39,21 @@ export class BusinessHoursController {
       next(error);
     }
   };
+
+  getBusinessHoursPublic = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { business_id } = req.params as { business_id: string };
+      const result =
+        await this.BusinessHoursService.getBusinessHours(business_id);
+      res.status(200).json({
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

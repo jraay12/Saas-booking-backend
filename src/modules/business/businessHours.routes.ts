@@ -11,7 +11,7 @@ const businessHoursRoutes = (
 
   routes.post("/", authMiddleware, businessHoursController.createBusinessHours);
   routes.get("/", authMiddleware, businessHoursController.getBusinessHours);
-
+  routes.get("/:business_id/public", businessHoursController.getBusinessHoursPublic);
   return routes;
 };
 
