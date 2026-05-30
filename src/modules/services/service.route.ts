@@ -16,6 +16,8 @@ const serviceRoutes = (serviceController: ServiceController): Router => {
 
   routes.get("/", authMiddleware, serviceController.getServices);
 
+  routes.get("/public", serviceController.getServices);
+
   routes.get("/:id", serviceController.getServiceById);
 
   routes.patch(
