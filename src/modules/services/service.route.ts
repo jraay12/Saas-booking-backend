@@ -26,9 +26,19 @@ const serviceRoutes = (serviceController: ServiceController): Router => {
     serviceController.updateService,
   );
 
-  routes.get("/:id/assigned", authMiddleware, serviceController.findAllAssignedStaffService);
+  routes.get(
+    "/:id/assigned",
+    authMiddleware,
+    serviceController.findAllAssignedStaffService,
+  );
 
-   routes.get("/:id/unassigned", authMiddleware, serviceController.getUnassignedStaffs);
+  routes.get("/:id/assigned/public", serviceController.findAllAssignedStaffService);
+
+  routes.get(
+    "/:id/unassigned",
+    authMiddleware,
+    serviceController.getUnassignedStaffs,
+  );
 
   routes.delete("/:id", serviceController.deleteService);
 
@@ -36,7 +46,11 @@ const serviceRoutes = (serviceController: ServiceController): Router => {
 
   routes.post("/remove", authMiddleware, serviceController.removeStaff);
 
-  routes.post("/:id/toggle-status", authMiddleware, serviceController.toggleStatus)
+  routes.post(
+    "/:id/toggle-status",
+    authMiddleware,
+    serviceController.toggleStatus,
+  );
 
   return routes;
 };
