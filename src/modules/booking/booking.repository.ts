@@ -1,5 +1,7 @@
 import { PrismaClient as PrismaClientType, Prisma } from "@prisma/client";
 
+type PrismaTx = Prisma.TransactionClient;
+
 export class BookingRepository {
   constructor(private prisma: PrismaClientType) {}
 
@@ -21,10 +23,25 @@ export class BookingRepository {
           lte: endOfDay,
         },
       },
+      include: {
+        service: {
+          select: {
+            hour: true,
+            minute: true,
+          },
+        },
+      },
 
       orderBy: {
         start_time: "asc",
       },
+    });
+  }
+
+  async create(data: Prisma.BookingCreateInput, tx?: PrismaTx) {
+    const client = tx ?? this.prisma;
+    return await client.booking.create({
+      data,
     });
   }
 }

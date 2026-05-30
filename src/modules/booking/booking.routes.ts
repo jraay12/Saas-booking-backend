@@ -6,7 +6,8 @@ import { BookingController } from "./booking.controller";
 const bookingRoutes = (bookingController: BookingController): Router => {
   const routes = Router();
 
-  routes.get("/available/:business_id", bookingController.getAvailableSlots); 
+  routes.get("/available/:business_id", bookingController.getAvailableSlots);
+  routes.post("/:business_id", bookingController.createBooking);
 
   return routes;
 };

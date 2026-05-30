@@ -1,8 +1,12 @@
-import { DayOfWeek } from "@prisma/client";
+import { DayOfWeek, Prisma } from "@prisma/client";
 import { BadRequestError } from "../../shared/errors/BadRequestError";
 import { BusinessHoursRepository } from "../business/businessHours.repository";
 import { BookingRepository } from "./booking.repository";
 import { ServiceRepository } from "../services/service.repository";
+import { CreateBookingDto } from "./validator/booking.validator";
+import { NotFoundError } from "../../shared/errors/NotFoundError";
+import { MembershipRepository } from "../membership/membership.repository";
+import { BusinessRepository } from "../business/business.repository";
 
 interface GetAvailabilityParams {
   business_id: string;
@@ -16,6 +20,8 @@ export class BookingService {
     private businessHoursRepo: BusinessHoursRepository,
     private bookingRepo: BookingRepository,
     private serviceRepo: ServiceRepository,
+    private membershipRepo: MembershipRepository,
+    private businessRepo: BusinessRepository,
   ) {}
 
   async getAvailableSlots({
@@ -24,14 +30,17 @@ export class BookingService {
     staff_id,
     booking_date,
   }: GetAvailabilityParams) {
-    // validate service
+    // 1. validate service
     const service = await this.serviceRepo.findById(service_id);
 
     if (!service) {
       throw new Error("Service not found");
     }
 
-    // validate staff assigned to service
+    // service duration (ONLY SOURCE OF TRUTH)
+    const serviceDuration = service.hour * 60 + service.minute;
+
+    // 2. validate staff assigned to service
     const assignedStaff = await this.serviceRepo.findAssignedStaff(
       service_id,
       staff_id,
@@ -41,13 +50,10 @@ export class BookingService {
       throw new Error("Staff is not assigned to this service");
     }
 
-    // service duration
-    const durationMinutes = service.hour * 60 + service.minute;
-
-    // get day
+    // 3. get day
     const day = this.getDayOfWeek(booking_date);
 
-    // get business hours
+    // 4. get business hours
     const businessHours = await this.businessHoursRepo.findByDay(
       business_id,
       day,
@@ -57,28 +63,30 @@ export class BookingService {
       throw new BadRequestError("It is closed today");
     }
 
-    // get existing staff bookings
+    // 5. existing bookings (IMPORTANT: include service duration)
     const bookings = await this.bookingRepo.findBookingsByStaffAndDate(
       staff_id,
       booking_date,
     );
 
-    // generate slots
+    // 6. generate all possible slots
     const slots = this.generateTimeSlots(
       businessHours.open_time,
       businessHours.close_time,
-      durationMinutes,
+      serviceDuration,
     );
 
-    // remove occupied slots
+    // 7. filter available slots
     const availableSlots = slots.filter((slot) =>
-      this.isSlotAvailable(slot, durationMinutes, bookings),
+      this.isSlotAvailable(slot, serviceDuration, bookings),
     );
-
 
     return availableSlots;
   }
 
+  // -----------------------------
+  // SLOT GENERATOR
+  // -----------------------------
   private generateTimeSlots(
     openTime: string,
     closeTime: string,
@@ -87,28 +95,22 @@ export class BookingService {
     const slots: string[] = [];
 
     const [openHour, openMinute] = openTime.split(":").map(Number);
-
     const [closeHour, closeMinute] = closeTime.split(":").map(Number);
 
     const start = new Date();
-
     start.setHours(openHour, openMinute, 0, 0);
 
     const end = new Date();
-
     end.setHours(closeHour, closeMinute, 0, 0);
 
     while (start < end) {
       const slotStart = new Date(start);
-
       const slotEnd = new Date(start);
 
       slotEnd.setMinutes(slotEnd.getMinutes() + durationMinutes);
 
-      // stop if exceeds business hours
-      if (slotEnd > end) {
-        break;
-      }
+      // stop if slot exceeds business hours
+      if (slotEnd > end) break;
 
       slots.push(slotStart.toTimeString().slice(0, 5));
 
@@ -118,31 +120,41 @@ export class BookingService {
     return slots;
   }
 
+  // -----------------------------
+  // AVAILABILITY CHECK
+  // -----------------------------
   private isSlotAvailable(
     slot: string,
-    durationMinutes: number,
+    serviceDuration: number,
     bookings: {
       start_time: string;
-      end_time: string;
+      service: {
+        hour: number;
+        minute: number;
+      };
     }[],
   ) {
     const slotStart = this.toMinutes(slot);
-
-    const slotEnd = slotStart + durationMinutes;
+    const slotEnd = slotStart + serviceDuration;
 
     return !bookings.some((booking) => {
       const bookingStart = this.toMinutes(booking.start_time);
 
-      const bookingEnd = this.toMinutes(booking.end_time);
+      const bookingDuration =
+        booking.service.hour * 60 + booking.service.minute;
+
+      const bookingEnd = bookingStart + bookingDuration;
 
       // overlap detection
       return slotStart < bookingEnd && slotEnd > bookingStart;
     });
   }
 
+  // -----------------------------
+  // HELPERS
+  // -----------------------------
   private toMinutes(time: string) {
     const [hour, minute] = time.split(":").map(Number);
-
     return hour * 60 + minute;
   }
 
@@ -159,4 +171,93 @@ export class BookingService {
 
     return days[date.getDay()];
   }
+
+  async createBookings(dto: CreateBookingDto, business_id: string) {
+    const existingBusiness = await this.businessRepo.findById(business_id);
+
+    if (!existingBusiness) {
+      throw new NotFoundError("Business not found");
+    }
+
+    const isStaffMember = await this.membershipRepo.findStaffMember(
+      dto.staff_id,
+      business_id,
+    );
+
+    if (!isStaffMember) throw new BadRequestError("Invalid Staff");
+
+    if (!isStaffMember.user.is_active) {
+      throw new BadRequestError("Staff is unavailable");
+    }
+
+    const isServiceBelongsToBusiness =
+      await this.serviceRepo.findByServiceBusinessId(
+        dto.service_id,
+        business_id,
+      );
+
+    if (!isServiceBelongsToBusiness)
+      throw new BadRequestError("Service is not exist in the business");
+
+    const bookingDateTime = new Date(dto.booking_date);
+
+    const [hours, minutes] = dto.start_time.split(":").map(Number);
+
+    bookingDateTime.setHours(hours, minutes, 0, 0);
+
+    if (bookingDateTime < new Date()) {
+      throw new BadRequestError("Cannot book in the past");
+    }
+
+    const availableSlots = await this.getAvailableSlots({
+      booking_date: dto.booking_date,
+      business_id: business_id,
+      service_id: dto.service_id,
+      staff_id: dto.staff_id,
+    });
+
+    if (!availableSlots.includes(dto.start_time)) {
+      throw new BadRequestError("Invalid slot");
+    }
+
+    const payload: Prisma.BookingCreateInput = {
+      first_name: dto.first_name,
+      last_name: dto.last_name,
+      email_address: dto.email_address,
+      phone_number: dto.phone_number,
+      aditional_notes: dto.aditional_notes,
+      service_price: isServiceBelongsToBusiness.price,
+
+      payment_method: dto.payment_method,
+
+      booking_date: dto.booking_date,
+
+      start_time: dto.start_time,
+
+      business: {
+        connect: { id: business_id },
+      },
+      service: {
+        connect: { id: dto.service_id },
+      },
+      staff: {
+        connect: { id: dto.staff_id },
+      },
+    };
+
+    try {
+      return await this.bookingRepo.create(payload);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        throw new BadRequestError("This slot is no longer available");
+      }
+
+      throw error;
+    }
+  }
+
+  
 }

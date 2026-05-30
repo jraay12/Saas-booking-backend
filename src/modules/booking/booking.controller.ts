@@ -1,7 +1,10 @@
 import { AuthRequest } from "../../shared/middleware/authMiddleware";
 import { Request, Response, NextFunction } from "express";
 import { BookingService } from "./booking.service";
-import { getAvailabilitySchema } from "./validator/booking.validator";
+import {
+  CreateBookingDtoSchema,
+  getAvailabilitySchema,
+} from "./validator/booking.validator";
 
 export class BookingController {
   constructor(private bookingService: BookingService) {}
@@ -22,6 +25,23 @@ export class BookingController {
       });
       res.status(200).json({
         message: "Available slots fetched successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createBooking = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { business_id } = req.params as { business_id: string };
+
+      const validatedBody = CreateBookingDtoSchema.parse(req.body);
+
+      const result = await this.bookingService.createBookings(validatedBody, business_id);
+
+      res.status(201).json({
+        message: "Booking created successfully",
         data: result,
       });
     } catch (error) {

@@ -162,12 +162,17 @@ model Booking {
   business_id  String
   service_id   String
   staff_id     String
+  first_name String
+  last_name String
+  email_address String
+  phone_number String
+  aditional_notes String?
+  payment_method PaymentMethod
 
   booking_date DateTime
  
-
+  service_price Decimal @db.Decimal(10,2)
   start_time   String
-  end_time     String
 
   created_at   DateTime @default(now())
 
@@ -178,4 +183,10 @@ model Booking {
   @@index([business_id])
   @@index([service_id])
   @@index([staff_id])
+  @@unique([staff_id, booking_date, start_time])
+}
+
+enum PaymentMethod {
+  CASH
+  BANK
 }
