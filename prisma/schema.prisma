@@ -33,6 +33,7 @@ model User {
   // relations
   memberships   Membership[]
   serviceStaff ServiceStaff[]
+  booking Booking[]
 }
 
 model Membership {
@@ -79,7 +80,7 @@ model Business {
 
   service Service[]
   businessHour BusinessHour[]
-
+  booking Booking[]
 }
 
 enum Role {
@@ -106,6 +107,7 @@ model Service {
   business      Business @relation(fields: [business_id], references: [id])
 
   serviceStaff ServiceStaff[]
+   booking Booking[]
 }
 
 model ServiceStaff {
@@ -152,4 +154,28 @@ enum DayOfWeek {
   FRIDAY
   SATURDAY
   SUNDAY
+}
+
+
+model Booking {
+  id           String   @id @default(cuid())
+  business_id  String
+  service_id   String
+  staff_id     String
+
+  booking_date DateTime
+ 
+
+  start_time   String
+  end_time     String
+
+  created_at   DateTime @default(now())
+
+  business     Business @relation(fields: [business_id], references: [id])
+  service      Service  @relation(fields: [service_id], references: [id])
+  staff        User     @relation(fields: [staff_id], references: [id])
+
+  @@index([business_id])
+  @@index([service_id])
+  @@index([staff_id])
 }

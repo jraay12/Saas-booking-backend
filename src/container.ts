@@ -1,3 +1,4 @@
+import { BusinessController } from './modules/business/business.controller';
 import { ServiceController } from "./modules/services/service.controller";
 import { ServiceRepository } from "./modules/services/service.repository";
 import { ServiceService } from "./modules/services/service.service";
@@ -16,6 +17,10 @@ import { MembershipController } from "./modules/membership/membership.controller
 import { BusinessHoursController } from "./modules/business/businessHours.controller";
 import { BusinessHoursRepository } from "./modules/business/businessHours.repository";
 import { BusinessHoursService } from "./modules/business/businessHours.service";
+import { BookingRepository } from "./modules/booking/booking.repository";
+import { BookingService } from "./modules/booking/booking.service";
+import { BookingController } from "./modules/booking/booking.controller";
+
 import { prisma } from "./lib/prisma";
 
 // repository
@@ -24,7 +29,7 @@ const userRepository = new UserRepository(prisma)
 const membershipRepository = new MembershipRepository(prisma)
 const businessRepository = new BusinessRepository(prisma)
 const businessHoursRepository = new BusinessHoursRepository(prisma)
-
+const bookingRepository = new BookingRepository(prisma)
 // service
 
 const userService = new UserService(userRepository)
@@ -34,6 +39,7 @@ const authService = new AuthService(prisma, userService, businessService, member
 const staffService = new StaffService(userService, membershipService, prisma)
 const serviceService = new ServiceService(serviceRepo, membershipService, membershipRepository)
 const businessHoursService = new BusinessHoursService(businessHoursRepository)
+const bookingService = new BookingService(businessHoursRepository, bookingRepository, serviceRepo)
 // controller 
 
 export const serviceController = new ServiceController(serviceService)
@@ -42,3 +48,5 @@ export const authController = new AuthController(authService)
 export const staffController = new StaffController(staffService)
 export const membershipController = new MembershipController(membershipService)
 export const businessHoursController = new BusinessHoursController(businessHoursService)
+export const bookingController = new BookingController(bookingService)
+export const businessController = new BusinessController(businessService)

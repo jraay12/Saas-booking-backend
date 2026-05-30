@@ -50,4 +50,16 @@ export class BusinessHoursRepository {
       }
     })
   }
+
+  async findByDay(
+    business_id: string,
+    day: DayOfWeek,
+  ) {
+    return this.prisma.businessHour.findFirst({
+      where: {
+        business_id,
+        day,
+      },
+    });
+  }
 }

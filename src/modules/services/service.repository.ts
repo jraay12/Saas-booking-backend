@@ -178,4 +178,12 @@ export class ServiceRepository {
     });
   }
 
+  async findAssignedStaff(service_id: string, staff_id: string) {
+    return await this.prisma.serviceStaff.findFirst({
+      where: {
+        service_id,
+        staff_id,
+      },
+    });
+  }
 }
