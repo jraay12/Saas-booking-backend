@@ -5,6 +5,7 @@ import { UserRepository } from "./user.repository";
 
 import { CreateUserDTO } from "./validation/user.validation";
 import { ConflictError } from "../../shared/errors/ConflictError";
+import { NotFoundError } from "../../shared/errors/NotFoundError";
 
 export class UserService {
   constructor(private userRepo: UserRepository) {}
@@ -31,8 +32,8 @@ export class UserService {
         phone: data.phone,
       }),
       ...(data.avatar && {
-        avatar: data.avatar
-      })
+        avatar: data.avatar,
+      }),
     };
 
     return await this.userRepo.create(payload, tx);
@@ -48,5 +49,18 @@ export class UserService {
     if (existingPhone) throw new ConflictError("Phone already exists");
 
     return existingPhone;
+  }
+
+  async findById(id: string, tx?: Prisma.TransactionClient) {
+    const exisitngUser = await this.userRepo.findById(id, tx);
+    
+    console.log(exisitngUser)
+    if (!exisitngUser) {
+      throw new NotFoundError("User not found");
+    }
+
+    const { password, ...safeUser } = exisitngUser;
+
+    return safeUser;
   }
 }

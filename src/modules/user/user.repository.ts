@@ -39,4 +39,14 @@ export class UserRepository {
       },
     });
   }
+
+  async findById(id: string, tx?: PrismaTx) {
+    const client = tx ?? this.prisma;
+
+    return await client.user.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
 }

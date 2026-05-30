@@ -12,6 +12,8 @@ const userRoutes = (
     {name: "avatar", maxCount: 1}
   ]), userController.createUser);
 
+  routes.get("/:id", userController.findById)
+
   return routes;
 };
 

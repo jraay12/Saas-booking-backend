@@ -8,11 +8,7 @@ import { createUserSchema } from "./validation/user.validation";
 export class UserController {
   constructor(private userService: UserService) {}
 
-  createUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
+  createUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = createUserSchema.parse(req.body);
 
@@ -36,13 +32,20 @@ export class UserController {
             req.file.filename,
           );
         } catch (fsErr) {
-          console.error(
-            "Failed to delete orphaned avatar:",
-            fsErr,
-          );
+          console.error("Failed to delete orphaned avatar:", fsErr);
         }
       }
 
+      next(error);
+    }
+  };
+
+  findById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params as { id: string };
+      const result = await this.userService.findById(id);
+      res.status(200).json(result);
+    } catch (error) {
       next(error);
     }
   };
