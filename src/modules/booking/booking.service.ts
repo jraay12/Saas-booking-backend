@@ -1,4 +1,4 @@
-import { DayOfWeek, Prisma } from "@prisma/client";
+import { BookingStatus, DayOfWeek, Prisma } from "@prisma/client";
 import { BadRequestError } from "../../shared/errors/BadRequestError";
 import { BusinessHoursRepository } from "../business/businessHours.repository";
 import { BookingRepository } from "./booking.repository";
@@ -7,6 +7,8 @@ import { CreateBookingDto } from "./validator/booking.validator";
 import { NotFoundError } from "../../shared/errors/NotFoundError";
 import { MembershipRepository } from "../membership/membership.repository";
 import { BusinessRepository } from "../business/business.repository";
+import { MembershipService } from "../membership/membership.service";
+import { ForbbidenError } from "../../shared/errors/ForbiddenError";
 
 interface GetAvailabilityParams {
   business_id: string;
@@ -22,6 +24,7 @@ export class BookingService {
     private serviceRepo: ServiceRepository,
     private membershipRepo: MembershipRepository,
     private businessRepo: BusinessRepository,
+    private membershipService: MembershipService,
   ) {}
 
   async getAvailableSlots({
@@ -261,5 +264,32 @@ export class BookingService {
 
   async fetchAllBookings(business_id: string) {
     return await this.bookingRepo.getBookings(business_id);
+  }
+
+  async confirmBooking(id: string, user_id: string, business_id: string) {
+    const existingBooking = await this.bookingRepo.findById(id);
+    if (!existingBooking) throw new NotFoundError("Booking not found");
+
+    if (existingBooking.business_id !== business_id) {
+      throw new ForbbidenError("Booking does not belong to this business");
+    }
+
+    const isOwner = await this.membershipService.assertOwner(
+      user_id,
+      business_id,
+    );
+
+    const isAssignedStaff = existingBooking.staff_id === user_id;
+
+    if (!isOwner && !isAssignedStaff)
+      throw new ForbbidenError("Not allowed to confirm the booking");
+
+    if (existingBooking.status !== BookingStatus.PENDING) {
+      throw new BadRequestError(`Booking is already ${existingBooking.status}`);
+    }
+
+    return await this.bookingRepo.updateBooking(id, {
+      status: "CONFIRMED",
+    });
   }
 }

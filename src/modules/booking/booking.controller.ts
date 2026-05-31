@@ -69,4 +69,27 @@ export class BookingController {
       next(error);
     }
   };
+
+  confirmBooking = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const business_id = req.user?.businessId!;
+      const user_id = req.user?.userId!;
+      const { id } = req.params as { id: string };
+      const result = await this.bookingService.confirmBooking(
+        id,
+        user_id,
+        business_id,
+      );
+
+      res.status(201).json({
+        message: `Successfully confirm the booking of ${result.first_name} ${result.last_name}`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

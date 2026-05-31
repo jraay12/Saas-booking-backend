@@ -39,7 +39,7 @@ const authService = new AuthService(prisma, userService, businessService, member
 const staffService = new StaffService(userService, membershipService, prisma)
 const serviceService = new ServiceService(serviceRepo, membershipService, membershipRepository)
 const businessHoursService = new BusinessHoursService(businessHoursRepository)
-const bookingService = new BookingService(businessHoursRepository, bookingRepository, serviceRepo, membershipRepository, businessRepository)
+const bookingService = new BookingService(businessHoursRepository, bookingRepository, serviceRepo, membershipRepository, businessRepository, membershipService)
 // controller 
 
 export const serviceController = new ServiceController(serviceService)

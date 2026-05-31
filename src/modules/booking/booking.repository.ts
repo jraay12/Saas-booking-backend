@@ -54,15 +54,37 @@ export class BookingRepository {
         staff: {
           select: {
             first_name: true,
-            last_name: true
-          }
+            last_name: true,
+          },
         },
         service: {
           select: {
-            service_name: true
-          }
-        }
-      }
+            service_name: true,
+          },
+        },
+      },
+    });
+  }
+
+  async updateBooking(
+    id: string,
+    data: Prisma.BookingUpdateInput,
+    tx?: PrismaTx,
+  ) {
+    const client = tx ?? this.prisma;
+    return await client.booking.update({
+      where: {
+        id,
+      },
+      data,
+    });
+  }
+
+  async findById(id: string) {
+    return await this.prisma.booking.findUnique({
+      where: {
+        id,
+      },
     });
   }
 }
