@@ -63,6 +63,9 @@ export class BookingRepository {
           },
         },
       },
+      orderBy: {
+        created_at: "desc"
+      }
     });
   }
 
