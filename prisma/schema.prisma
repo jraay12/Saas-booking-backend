@@ -168,7 +168,7 @@ model Booking {
   phone_number String
   aditional_notes String?
   payment_method PaymentMethod
-
+  status BookingStatus @default(PENDING)
   booking_date DateTime
  
   service_price Decimal @db.Decimal(10,2)
@@ -189,4 +189,12 @@ model Booking {
 enum PaymentMethod {
   CASH
   BANK
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
 }
