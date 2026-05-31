@@ -8,8 +8,18 @@ const bookingRoutes = (bookingController: BookingController): Router => {
 
   routes.get("/available/:business_id", bookingController.getAvailableSlots);
   routes.post("/:business_id", bookingController.createBooking);
-  routes.get("/", authMiddleware, bookingController.fetchAllBookings)
-  routes.patch("/:id/confirm", authMiddleware, bookingController.confirmBooking)
+  routes.get("/", authMiddleware, bookingController.fetchAllBookings);
+  routes.patch(
+    "/:id/confirm",
+    authMiddleware,
+    bookingController.confirmBooking,
+  );
+  routes.patch(
+    "/:id/cancel",
+    authMiddleware,
+    bookingController.cancelBooking,
+  );
+
   return routes;
 };
 

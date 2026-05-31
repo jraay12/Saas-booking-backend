@@ -92,4 +92,27 @@ export class BookingController {
       next(error);
     }
   };
+
+   cancelBooking = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const business_id = req.user?.businessId!;
+      const user_id = req.user?.userId!;
+      const { id } = req.params as { id: string };
+      const result = await this.bookingService.cancelBooking(
+        id,
+        user_id,
+        business_id,
+      );
+
+      res.status(201).json({
+        message: `Successfully cancel the booking of ${result.first_name} ${result.last_name}`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

@@ -292,4 +292,27 @@ export class BookingService {
       status: "CONFIRMED",
     });
   }
+
+  async cancelBooking(id: string, user_id: string, business_id: string) {
+    const existingBooking = await this.bookingRepo.findById(id);
+    if (!existingBooking) throw new NotFoundError("Booking not found");
+
+    if (existingBooking.business_id !== business_id) {
+      throw new ForbbidenError("Booking does not belong to this business");
+    }
+
+    const isOwner = await this.membershipService.assertOwner(
+      user_id,
+      business_id,
+    );
+
+    const isAssignedStaff = existingBooking.staff_id === user_id;
+
+    if (!isOwner && !isAssignedStaff)
+      throw new ForbbidenError("Not allowed to confirm the booking");
+
+    return await this.bookingRepo.updateBooking(id, {
+      status: "CANCELLED",
+    });
+  }
 }
