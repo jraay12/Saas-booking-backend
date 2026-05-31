@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import { UserService } from "./user.service";
 
 import { createUserSchema } from "./validation/user.validation";
+import { AuthRequest } from "../../shared/middleware/authMiddleware";
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -44,6 +45,16 @@ export class UserController {
     try {
       const { id } = req.params as { id: string };
       const result = await this.userService.findById(id);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  myProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const user_id = req.user?.userId!;
+      const result = await this.userService.findById(user_id);
       res.status(200).json(result);
     } catch (error) {
       next(error);

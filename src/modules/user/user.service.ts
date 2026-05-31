@@ -53,8 +53,8 @@ export class UserService {
 
   async findById(id: string, tx?: Prisma.TransactionClient) {
     const exisitngUser = await this.userRepo.findById(id, tx);
-    
-    console.log(exisitngUser)
+ 
+  
     if (!exisitngUser) {
       throw new NotFoundError("User not found");
     }

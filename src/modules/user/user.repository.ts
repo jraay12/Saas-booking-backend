@@ -45,7 +45,7 @@ export class UserRepository {
 
     return await client.user.findUnique({
       where: {
-        id,
+        id: id,
       },
     });
   }
