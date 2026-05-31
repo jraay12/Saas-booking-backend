@@ -259,5 +259,7 @@ export class BookingService {
     }
   }
 
-  
+  async fetchAllBookings(business_id: string) {
+    return await this.bookingRepo.getBookings(business_id);
+  }
 }

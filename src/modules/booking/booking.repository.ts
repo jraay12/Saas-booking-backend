@@ -44,4 +44,25 @@ export class BookingRepository {
       data,
     });
   }
+
+  async getBookings(business_id: string) {
+    return await this.prisma.booking.findMany({
+      where: {
+        business_id,
+      },
+      include: {
+        staff: {
+          select: {
+            first_name: true,
+            last_name: true
+          }
+        },
+        service: {
+          select: {
+            service_name: true
+          }
+        }
+      }
+    });
+  }
 }

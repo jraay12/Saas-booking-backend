@@ -38,10 +38,31 @@ export class BookingController {
 
       const validatedBody = CreateBookingDtoSchema.parse(req.body);
 
-      const result = await this.bookingService.createBookings(validatedBody, business_id);
+      const result = await this.bookingService.createBookings(
+        validatedBody,
+        business_id,
+      );
 
       res.status(201).json({
         message: "Booking created successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  fetchAllBookings = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const business_id = req.user?.businessId!;
+      const result = await this.bookingService.fetchAllBookings(business_id);
+
+      res.status(201).json({
+        message: "Successfully fetched all bookings",
         data: result,
       });
     } catch (error) {
