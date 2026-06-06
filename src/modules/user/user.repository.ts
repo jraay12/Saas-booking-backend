@@ -30,6 +30,11 @@ export class UserRepository {
     });
   }
 
+  async findByEmailPlain(email: string, tx?: PrismaTx) {
+    const client = tx ?? this.prisma;
+    return await client.user.findUnique({ where: { email } });
+  }
+
   async findByPhone(phone?: string, tx?: PrismaTx) {
     const client = tx ?? this.prisma;
 

@@ -115,8 +115,6 @@ export class AuthController {
 
     const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL;
 
-    console.log(req.query);
-
     const { code } = req.query;
 
     const data = {
@@ -147,13 +145,13 @@ export class AuthController {
 
     try {
       const result = await token_info_response.json();
-      await this.authService.OAuth({
+      const { access_token } = await this.authService.OAuth({
         avatar: result.picture,
         email: result.email,
-        first_name: result.name,
+        first_name: result.given_name,
         last_name: result.family_name,
       });
-      res.status(201).json({ message: "successfully registered" });
+      res.status(201).json({ token: access_token });
     } catch (error) {
       next(error);
     }

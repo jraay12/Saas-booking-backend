@@ -8,6 +8,7 @@ import { LoginDTO, RegisterDTO } from "./validation/auth.validation";
 import { UserRepository } from "../user/user.repository";
 import { UnAuthorized } from "../../shared/errors/UnAuthorized";
 import { ConflictError } from "../../shared/errors/ConflictError";
+import { BadRequestError } from "../../shared/errors/BadRequestError";
 
 export class AuthService {
   constructor(
@@ -155,6 +156,27 @@ export class AuthService {
     last_name: string;
     avatar: string;
   }) {
-    await this.userService.createOAuthUser(data);
+    let user = await this.userRepo.findByEmailPlain(data.email);
+
+    // 1. Create user if not exists
+    if (!user) {
+      user = await this.userService.createOAuthUser(data);
+    }
+
+    if (!user) {
+      throw new BadRequestError("OAuth user creation failed");
+    }
+
+    // 2. Create JWT payload
+    const tokenPayload = {
+      userId: user.id,
+    };
+
+    // 3. Sign token
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET!, {
+      expiresIn: "7d",
+    });
+
+    return { access_token: token, user };
   }
 }
