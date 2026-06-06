@@ -44,49 +44,17 @@ export class AuthService {
         tx,
       );
 
-      // create business
-      const business = await this.businessService.create(
-        {
-          business_name: data.business_name,
+      // 4. Create JWT payload
+      const tokenPayload = {
+        userId: user.id,
+      };
 
-          category: data.category,
-
-          ...(data.description && {
-            description: data.description,
-          }),
-
-          ...(data.business_email && {
-            email: data.business_email,
-          }),
-
-          ...(data.business_phone && {
-            phone: data.business_phone,
-          }),
-
-          ...(data.address && {
-            address: data.address,
-          }),
-
-          ...(data.logo && {
-            logo: data.logo,
-          }),
-        },
-        tx,
-      );
-
-      // create membership
-      await this.membershipService.create(
-        {
-          user_id: user.id,
-          business_id: business.id,
-          role: "OWNER",
-        },
-        tx,
-      );
+      const token = jwt.sign(tokenPayload, process.env.JWT_SECRET!, {
+        expiresIn: "7d",
+      });
 
       return {
-        user,
-        business,
+        access_token: token,
       };
     });
   }
