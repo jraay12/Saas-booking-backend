@@ -7,6 +7,7 @@ import { BusinessService } from "../business/business.service";
 import { LoginDTO, RegisterDTO } from "./validation/auth.validation";
 import { UserRepository } from "../user/user.repository";
 import { UnAuthorized } from "../../shared/errors/UnAuthorized";
+import { ConflictError } from "../../shared/errors/ConflictError";
 
 export class AuthService {
   constructor(
@@ -98,7 +99,7 @@ export class AuthService {
     }
 
     // 2. Check password
-    const isPasswordValid = await bcrypt.compare(data.password, user.password);
+    const isPasswordValid = await bcrypt.compare(data.password, user.password!);
 
     if (!isPasswordValid) {
       throw new UnAuthorized("Invalid email or password");
@@ -146,5 +147,14 @@ export class AuthService {
       },
       role: membership.role,
     };
+  }
+
+  async OAuth(data: {
+    email: string;
+    first_name: string;
+    last_name: string;
+    avatar: string;
+  }) {
+    await this.userService.createOAuthUser(data);
   }
 }

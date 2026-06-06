@@ -15,13 +15,19 @@ export const createUserSchema = z.object({
     .email("Invalid email address")
     .max(255, "Email must not exceed 255 characters"),
 
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 
   phone: z.string().optional(),
 });
 
 export type CreateUserDTO = z.infer<typeof createUserSchema> & {
-  avatar?: string
+  avatar?: string;
+};
+
+export const createOAuthUserSchema = createUserSchema.omit({
+  password: true,
+});
+
+export type CreateOAuthUserDTO = z.infer<typeof createOAuthUserSchema> & {
+  avatar?: string;
 };

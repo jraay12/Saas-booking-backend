@@ -29,6 +29,9 @@ const authRoutes = (
 
   routes.post("/login", authController.login)
 
+  routes.get('/', authController.oauth)
+  routes.get("/google/callback", authController.callback)
+
   return routes;
 };
 

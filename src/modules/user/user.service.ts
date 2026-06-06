@@ -3,7 +3,10 @@ import bcrypt from "bcrypt";
 
 import { UserRepository } from "./user.repository";
 
-import { CreateUserDTO } from "./validation/user.validation";
+import {
+  CreateOAuthUserDTO,
+  CreateUserDTO,
+} from "./validation/user.validation";
 import { ConflictError } from "../../shared/errors/ConflictError";
 import { NotFoundError } from "../../shared/errors/NotFoundError";
 
@@ -39,6 +42,35 @@ export class UserService {
     return await this.userRepo.create(payload, tx);
   }
 
+  async createOAuthUser(
+    data: CreateOAuthUserDTO,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const existingUser = await this.userRepo.findByEmail(data.email, tx);
+
+    if (existingUser) {
+      throw new ConflictError("User already exists");
+    }
+
+    if (data.phone) {
+      await this.findByPhone(data.phone);
+    }
+
+    const payload: Prisma.UserCreateInput = {
+      first_name: data.first_name,
+      last_name: data.last_name,
+      email: data.email,
+      ...(data.phone && {
+        phone: data.phone,
+      }),
+      ...(data.avatar && {
+        avatar: data.avatar,
+      }),
+    };
+
+    return await this.userRepo.create(payload, tx);
+  }
+
   async findByEmail(email: string, tx?: Prisma.TransactionClient) {
     return await this.userRepo.findByEmail(email, tx);
   }
@@ -53,8 +85,7 @@ export class UserService {
 
   async findById(id: string, tx?: Prisma.TransactionClient) {
     const exisitngUser = await this.userRepo.findById(id, tx);
- 
-  
+
     if (!exisitngUser) {
       throw new NotFoundError("User not found");
     }
