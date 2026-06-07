@@ -52,6 +52,13 @@ export class UserRepository {
       where: {
         id: id,
       },
+      include: {
+        memberships: {
+          select: {
+            role: true,
+          },
+        },
+      },
     });
   }
 }

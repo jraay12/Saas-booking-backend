@@ -13,7 +13,7 @@ export class AuthController {
     try {
       const data = registerSchema.parse(req.body);
 
-      const result = await this.authService.register({
+      const {access_token} = await this.authService.register({
         ...data,
 
         ...(req.files &&
@@ -48,7 +48,7 @@ export class AuthController {
           }),
       });
 
-      res.status(201).json(result);
+      res.status(201).json({token: access_token});
     } catch (error) {
       console.log(error);
       // rollback uploaded files

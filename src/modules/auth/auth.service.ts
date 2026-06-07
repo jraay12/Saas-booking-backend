@@ -74,24 +74,9 @@ export class AuthService {
       throw new UnAuthorized("Invalid email or password");
     }
 
-    // 3. Get membership (for now: first business)
-    const membership = user.memberships?.[0];
-
-    if (!membership) {
-      throw new UnAuthorized("User has no assigned business");
-    }
-
-    const business = membership.business;
-
-    if (!business) {
-      throw new UnAuthorized("Business not found");
-    }
-
     // 4. Create JWT payload
     const tokenPayload = {
       userId: user.id,
-      businessId: business.id,
-      role: membership.role,
     };
 
     // 5. Sign token
@@ -109,12 +94,6 @@ export class AuthService {
         email: user.email,
         avatar: user.avatar,
       },
-      business: {
-        id: business.id,
-        business_name: business.business_name,
-        slug: business.slug,
-      },
-      role: membership.role,
     };
   }
 
