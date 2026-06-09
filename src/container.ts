@@ -34,7 +34,7 @@ const bookingRepository = new BookingRepository(prisma)
 
 const userService = new UserService(userRepository)
 const  membershipService = new MembershipService(membershipRepository, serviceRepo, prisma)
-const businessService = new BusinessService(businessRepository)
+const businessService = new BusinessService(businessRepository, membershipService, prisma)
 const authService = new AuthService(prisma, userService, businessService, membershipService, userRepository)
 const staffService = new StaffService(userService, membershipService, prisma)
 const serviceService = new ServiceService(serviceRepo, membershipService, membershipRepository)
