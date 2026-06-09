@@ -130,7 +130,12 @@ export class ServiceController {
   assignStaff = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const data = assignStaffSchema.parse(req.body);
-      const business_id = req.user?.businessId!;
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
       const result = await this.serviceService.assignStaffToService({
         ...data,
         business_id: business_id,
@@ -145,11 +150,15 @@ export class ServiceController {
   removeStaff = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const data = removeStaffSchema.parse(req.body);
-      const business_id = req.user?.businessId!;
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
       await this.serviceService.removeStaffFromService(
         { service_id: data.service_id, staff_id: data.staff_id },
         business_id,
-        
       );
       return res.status(200).json({
         message: "Successfully remove staff",
@@ -166,7 +175,12 @@ export class ServiceController {
   ) => {
     try {
       const { id } = req.params as { id: string };
-      const business_id = req.user?.businessId!;
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
       const userId = req.user?.userId!;
       const result = await this.serviceService.toggleStatus(
         id,
@@ -191,7 +205,12 @@ export class ServiceController {
   ) => {
     try {
       const { id } = req.params as { id: string };
-      const business_id = req.user?.businessId!;
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
 
       const result = await this.serviceService.findAllAssignedStaffService(
         id,
@@ -211,7 +230,12 @@ export class ServiceController {
   ) => {
     try {
       const { id } = req.params as { id: string };
-      const business_id = req.user?.businessId!;
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
 
       const result = await this.serviceService.getUnassignedStaffs(
         id,

@@ -56,6 +56,7 @@ export class UserRepository {
         memberships: {
           select: {
             role: true,
+            business_id: true
           },
         },
       },

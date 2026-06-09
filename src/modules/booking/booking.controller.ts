@@ -58,7 +58,12 @@ export class BookingController {
     next: NextFunction,
   ) => {
     try {
-      const business_id = req.user?.businessId!;
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
       const result = await this.bookingService.fetchAllBookings(business_id);
 
       res.status(201).json({
@@ -76,7 +81,12 @@ export class BookingController {
     next: NextFunction,
   ) => {
     try {
-      const business_id = req.user?.businessId!;
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
       const user_id = req.user?.userId!;
       const { id } = req.params as { id: string };
       const result = await this.bookingService.confirmBooking(
@@ -93,13 +103,18 @@ export class BookingController {
     }
   };
 
-   cancelBooking = async (
+  cancelBooking = async (
     req: AuthRequest,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const business_id = req.user?.businessId!;
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
       const user_id = req.user?.userId!;
       const { id } = req.params as { id: string };
       const result = await this.bookingService.cancelBooking(
