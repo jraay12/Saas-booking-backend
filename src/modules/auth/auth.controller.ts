@@ -151,7 +151,9 @@ export class AuthController {
         first_name: result.given_name,
         last_name: result.family_name,
       });
-      res.status(201).json({ token: access_token });
+      const frontendUrl = process.env.FRONTEND_URL;
+      res.redirect(`${frontendUrl}/auth/callback#token=${access_token}`);
+
     } catch (error) {
       next(error);
     }
