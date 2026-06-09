@@ -11,7 +11,12 @@ export class MembershipController {
     next: NextFunction,
   ) => {
     try {
-      const business_id = req.user?.businessId;
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
 
       const result = await this.membershipService.findAllMembers(business_id!);
       res.status(200).json({
@@ -22,15 +27,19 @@ export class MembershipController {
     }
   };
 
-  removeStaff = async (
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction,
-  ) => {
+  removeStaff = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const business_id = req.user?.businessId;
-      const {user_id} = req.params as {user_id: string}
-      const result = await this.membershipService.removeStaff(user_id, business_id!);
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
+      const { user_id } = req.params as { user_id: string };
+      const result = await this.membershipService.removeStaff(
+        user_id,
+        business_id!,
+      );
       res.status(200).json({
         data: result,
       });

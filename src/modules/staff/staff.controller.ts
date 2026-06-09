@@ -15,11 +15,11 @@ class StaffController {
       // 1. validate body
       const data = createStaffSchema.parse(req.body);
 
-      // 2. get business from JWT
-      const business_id = req.user?.businessId;
+      const business_id = req.headers["x-business-id"] as string;
 
       if (!business_id) {
-        return res.status(403).json({ message: "Business not found in token" });
+        res.status(400).json({ message: "Business ID is required" });
+        return;
       }
 
       // 3. extract file from fields()

@@ -23,7 +23,12 @@ export class ServiceController {
     try {
       const data = createServiceSchema.parse(req.body);
 
-      const business_id = req.user?.businessId;
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
 
       if (!business_id) {
         return res.status(403).json({ message: "Business not found in token" });
@@ -69,8 +74,13 @@ export class ServiceController {
 
   getServices = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const businessId = req.user?.businessId;
-      const result = await this.serviceService.findAll(businessId!);
+      const business_id = req.headers["x-business-id"] as string;
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
+      const result = await this.serviceService.findAll(business_id!);
 
       res.status(200).json(result);
     } catch (error) {
