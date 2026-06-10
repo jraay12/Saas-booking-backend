@@ -56,10 +56,20 @@ export class UserRepository {
         memberships: {
           select: {
             role: true,
-            business_id: true
+            business_id: true,
           },
         },
       },
+    });
+  }
+
+  async update(id: string, data: Prisma.UserUpdateInput, tx?: PrismaTx) {
+    const client = tx ?? this.prisma;
+    return await client.user.update({
+      where: {
+        id,
+      },
+      data,
     });
   }
 }

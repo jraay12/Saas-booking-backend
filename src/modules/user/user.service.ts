@@ -1,11 +1,12 @@
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
-
+import * as fs from "fs/promises";
 import { UserRepository } from "./user.repository";
 
 import {
   CreateOAuthUserDTO,
   CreateUserDTO,
+  UpdateUserDTO,
 } from "./validation/user.validation";
 import { ConflictError } from "../../shared/errors/ConflictError";
 import { NotFoundError } from "../../shared/errors/NotFoundError";
@@ -40,6 +41,49 @@ export class UserService {
     };
 
     return await this.userRepo.create(payload, tx);
+  }
+
+  async update(
+    id: string,
+    dto: UpdateUserDTO,
+    avatar?: Express.Multer.File,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const user = await this.findById(id);
+
+    if (dto.email && dto.email !== user.email) {
+      const existing = await this.userRepo.findByEmail(dto.email);
+
+      if (existing) {
+        throw new ConflictError("Email already exists");
+      }
+    }
+
+    const data: Prisma.UserUpdateInput = {
+      first_name: dto.first_name,
+      last_name: dto.last_name,
+      email: dto.email,
+      phone: dto.phone
+    };
+
+    let oldAvatar: string | null = null;
+
+    if (avatar) {
+      data.avatar = avatar.path;
+      oldAvatar = user.avatar;
+    }
+
+    const updatedUser = await this.userRepo.update(id, data, tx);
+
+    if (oldAvatar) {
+      try {
+        await fs.unlink(oldAvatar);
+      } catch (error) {
+        console.error("Failed to delete old avatar", error);
+      }
+    }
+    const { password, ...safe } = updatedUser;
+    return safe;
   }
 
   async createOAuthUser(

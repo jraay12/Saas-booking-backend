@@ -31,3 +31,12 @@ export const createOAuthUserSchema = createUserSchema.omit({
 export type CreateOAuthUserDTO = z.infer<typeof createOAuthUserSchema> & {
   avatar?: string;
 };
+
+
+export const updateUserSchema = createUserSchema
+  .omit({ password: true })
+  .partial();
+
+export type UpdateUserDTO = z.infer<typeof updateUserSchema> & {
+  avatar?: string;
+};

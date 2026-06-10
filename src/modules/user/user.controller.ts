@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 
 import { UserService } from "./user.service";
 
-import { createUserSchema } from "./validation/user.validation";
+import { createUserSchema, UpdateUserDTO } from "./validation/user.validation";
 import { AuthRequest } from "../../shared/middleware/authMiddleware";
 
 export class UserController {
@@ -55,6 +55,25 @@ export class UserController {
     try {
       const user_id = req.user?.userId!;
       const result = await this.userService.findById(user_id);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params as {id: string};
+      const dto: UpdateUserDTO = req.body;
+
+      const files = req.files as {
+        avatar?: Express.Multer.File[];
+      };
+
+      const avatar = files?.avatar?.[0];
+
+      const result = await this.userService.update(id, dto, avatar);
+
       res.status(200).json(result);
     } catch (error) {
       next(error);
