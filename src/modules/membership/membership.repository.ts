@@ -61,6 +61,7 @@ export class MembershipRepository {
             email: true,
             first_name: true,
             last_name: true,
+            phone: true
           },
         },
       },
