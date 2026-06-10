@@ -9,6 +9,7 @@ import { MembershipRepository } from "../membership/membership.repository";
 import { BusinessRepository } from "../business/business.repository";
 import { MembershipService } from "../membership/membership.service";
 import { ForbbidenError } from "../../shared/errors/ForbiddenError";
+import { bookingProducer } from "./events/bookings.producer";
 
 interface GetAvailabilityParams {
   business_id: string;
@@ -249,7 +250,24 @@ export class BookingService {
     };
 
     try {
-      return await this.bookingRepo.create(payload);
+      const booking = await this.bookingRepo.create(payload);
+
+      try {
+        bookingProducer.bookingSuccess({
+          email: dto.email_address,
+          firstName: dto.first_name,
+          lastName: dto.last_name,
+          bookingDate: dto.booking_date,
+          startTime: dto.start_time,
+          bookingId: booking.id,
+          serviceName: isServiceBelongsToBusiness.service_name,
+          servicePrice: isServiceBelongsToBusiness.price.toNumber(),
+        });
+      } catch (err) {
+        console.error("RabbitMQ failed, but booking is saved:", err);
+      }
+
+      return booking;
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&

@@ -45,5 +45,23 @@ services:
       db:
         condition: service_healthy
 
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    container_name: rabbitmq_broker
+    restart: always
+    hostname: my-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=securepassword123
+      - RABBITMQ_DEFAULT_VHOST=my_vhost
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/mnesia/
+      - rabbitmq_logs:/var/log/rabbitmq
+
 volumes:
   saas_booking_data:
+  rabbitmq_data:
+  rabbitmq_logs:
