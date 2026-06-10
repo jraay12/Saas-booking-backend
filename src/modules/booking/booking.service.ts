@@ -316,7 +316,7 @@ export class BookingService {
         email: existingBooking.email_address,
         firstName: existingBooking.first_name,
         lastName: existingBooking.last_name,
-        startTime: existingBooking.start_time
+        startTime: existingBooking.start_time,
       });
     }
     return result;
@@ -340,8 +340,19 @@ export class BookingService {
     if (!isOwner && !isAssignedStaff)
       throw new ForbbidenError("Not allowed to confirm the booking");
 
-    return await this.bookingRepo.updateBooking(id, {
+    const result = await this.bookingRepo.updateBooking(id, {
       status: "CANCELLED",
     });
+
+    if (result) {
+      bookingProducer.bookingCancel({
+        bookingDate: existingBooking.booking_date,
+        email: existingBooking.email_address,
+        firstName: existingBooking.first_name,
+        lastName: existingBooking.last_name,
+        startTime: existingBooking.start_time,
+      });
+    }
+    return result;
   }
 }

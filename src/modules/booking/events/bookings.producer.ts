@@ -25,7 +25,6 @@ export const bookingProducer = {
       { persistent: true },
     );
 
-    setTimeout(() => closeRabbitMQ(), 500);
   },
 
   bookingConfirm(data: {
@@ -48,6 +47,28 @@ export const bookingProducer = {
       { persistent: true },
     );
 
-    setTimeout(() => closeRabbitMQ(), 500);
+  },
+
+  
+  bookingCancel(data: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    bookingDate: Date;
+    startTime: string;
+  }) {
+    const channel = getRabbitChannel();
+
+    channel.sendToQueue(
+      QUEUES.CANCEL,
+      Buffer.from(
+        JSON.stringify({
+          event: "BOOKING.CANCELLED",
+          payload: data,
+        }),
+      ),
+      { persistent: true },
+    );
+
   },
 };
