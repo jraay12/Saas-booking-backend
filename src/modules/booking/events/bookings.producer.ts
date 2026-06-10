@@ -1,4 +1,4 @@
-import { getRabbitChannel } from "../../../lib/rabbitmq";
+import { getRabbitChannel, closeRabbitMQ } from "../../../lib/rabbitmq";
 import { QUEUES } from "../../../lib/queue_names/queues";
 
 export const bookingProducer = {
@@ -24,5 +24,7 @@ export const bookingProducer = {
       ),
       { persistent: true },
     );
+
+    setTimeout(() => closeRabbitMQ(), 500);
   },
 };
