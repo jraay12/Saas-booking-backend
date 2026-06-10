@@ -306,9 +306,20 @@ export class BookingService {
       throw new BadRequestError(`Booking is already ${existingBooking.status}`);
     }
 
-    return await this.bookingRepo.updateBooking(id, {
+    const result = await this.bookingRepo.updateBooking(id, {
       status: "CONFIRMED",
     });
+
+    if (result) {
+      bookingProducer.bookingConfirm({
+        bookingDate: existingBooking.booking_date,
+        email: existingBooking.email_address,
+        firstName: existingBooking.first_name,
+        lastName: existingBooking.last_name,
+        startTime: existingBooking.start_time
+      });
+    }
+    return result;
   }
 
   async cancelBooking(id: string, user_id: string, business_id: string) {
