@@ -12,12 +12,14 @@ import {
   membershipController,
   businessHoursController,
   bookingController,
-  businessController
+  businessController,
+  dashboardController
 } from "./container";
 import staffRoutes from "./modules/staff/staff.routes";
 import businessHoursRoutes from "./modules/business/businessHours.routes";
 import bookingRoutes from "./modules/booking/booking.routes";
 import businessRoutes from "./modules/business/business.routes";
+import dashboardRoutes from "./modules/dashboard/dashboard.route";
 import path from "node:path";
 import cors, { CorsOptions } from "cors";
 const app = express();
@@ -39,6 +41,7 @@ app.use("/api/v1/membership", membershipRoutes(membershipController));
 app.use("/api/v1/business-hours", businessHoursRoutes(businessHoursController));
 app.use("/api/v1/booking", bookingRoutes(bookingController));
 app.use("/api/v1/business", businessRoutes(businessController));
+app.use("/api/v1/dashboard", dashboardRoutes(dashboardController));
 
 
 

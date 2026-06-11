@@ -20,7 +20,8 @@ import { BusinessHoursService } from "./modules/business/businessHours.service";
 import { BookingRepository } from "./modules/booking/booking.repository";
 import { BookingService } from "./modules/booking/booking.service";
 import { BookingController } from "./modules/booking/booking.controller";
-
+import { DashboardService } from './modules/dashboard/dashboard.service';
+import { DashbboardController } from './modules/dashboard/dashboard.controller';
 import { prisma } from "./lib/prisma";
 
 // repository
@@ -40,6 +41,7 @@ const staffService = new StaffService(userService, membershipService, prisma)
 const serviceService = new ServiceService(serviceRepo, membershipService, membershipRepository)
 const businessHoursService = new BusinessHoursService(businessHoursRepository)
 const bookingService = new BookingService(businessHoursRepository, bookingRepository, serviceRepo, membershipRepository, businessRepository, membershipService)
+const dashboardService = new DashboardService(bookingRepository)
 // controller 
 
 export const serviceController = new ServiceController(serviceService)
@@ -50,3 +52,4 @@ export const membershipController = new MembershipController(membershipService)
 export const businessHoursController = new BusinessHoursController(businessHoursService)
 export const bookingController = new BookingController(bookingService)
 export const businessController = new BusinessController(businessService)
+export const dashboardController = new DashbboardController(dashboardService)
