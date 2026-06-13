@@ -9,6 +9,7 @@ const dashboardRoutes = (
   const routes = Router();
 
   routes.get("/", authMiddleware, dashbboardController.dashboard);
+  routes.get("/staff", authMiddleware, dashbboardController.staffDashboard);
 
   return routes;
 };

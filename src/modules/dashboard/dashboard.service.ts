@@ -133,4 +133,39 @@ export class DashboardService {
       TODAY_SCHEDULE: cleanTodaysBookings,
     };
   }
+
+  async staffDashboard(business_id: string, staff_id: string) {
+    const [todaysBookings] = await Promise.all([
+      this.bookingRepo.getTodayScheduleBookingsByStaff(business_id, staff_id),
+    ]);
+
+    const cleanTodaysBookings = todaysBookings.map((item) => {
+      const hours = item.service.hour ?? 0;
+      const minutes = item.service.minute ?? 0;
+
+      const durationParts: string[] = [];
+
+      if (hours > 0) {
+        durationParts.push(`${hours}h`);
+      }
+
+      if (minutes > 0) {
+        durationParts.push(`${minutes}m`);
+      }
+
+      return {
+        id: item.id,
+        time: item.start_time,
+        client: `${item.first_name} ${item.last_name}`,
+        service: item.service.service_name,
+        status: item.status,
+        duration: durationParts.join(" "),
+        staff: `${item.staff.first_name} ${item.staff.last_name}`,
+      };
+    });
+
+    return {
+      TODAY_SCHEDULE: cleanTodaysBookings,
+    };
+  }
 }

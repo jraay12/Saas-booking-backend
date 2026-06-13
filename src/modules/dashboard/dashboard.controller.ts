@@ -25,4 +25,26 @@ export class DashbboardController {
       next(error);
     }
   };
+
+  staffDashboard = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const business_id = req.headers["x-business-id"] as string;
+      const user_id = req.user?.userId!
+
+      if (!business_id) {
+        res.status(400).json({ message: "Business ID is required" });
+        return;
+      }
+
+      const result = await this.dashboardService.staffDashboard(business_id, user_id);
+
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

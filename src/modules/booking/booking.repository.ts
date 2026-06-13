@@ -174,4 +174,43 @@ export class BookingRepository {
       },
     });
   }
+
+   async getTodayScheduleBookingsByStaff(business_id: string, staff_id: string) {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    return this.prisma.booking.findMany({
+      where: {
+        business_id,
+        status: "CONFIRMED",
+        staff_id,
+        booking_date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      take: 5,
+      orderBy: {
+        start_time: "asc",
+      },
+      include: {
+        service: {
+          select: {
+            service_name: true,
+            hour: true,
+            minute: true,
+          },
+        },
+        staff: {
+          select: {
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+    });
+  }
 }
