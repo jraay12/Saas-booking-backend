@@ -135,8 +135,9 @@ export class DashboardService {
   }
 
   async staffDashboard(business_id: string, staff_id: string) {
-    const [todaysBookings] = await Promise.all([
+    const [todaysBookings, upcomingBooking] = await Promise.all([
       this.bookingRepo.getTodayScheduleBookingsByStaff(business_id, staff_id),
+      this.bookingRepo.upcomingBooking(business_id, staff_id),
     ]);
 
     const cleanTodaysBookings = todaysBookings.map((item) => {
@@ -164,8 +165,21 @@ export class DashboardService {
       };
     });
 
+    const cleanUpCommingBooking = upcomingBooking
+      ? {
+          id: upcomingBooking.id,
+          time: upcomingBooking.start_time,
+          customer:
+            [upcomingBooking.first_name, upcomingBooking.last_name]
+              .filter(Boolean)
+              .join(" ") || null,
+          service_name: upcomingBooking.service?.service_name,
+        }
+      : null;
+
     return {
       TODAY_SCHEDULE: cleanTodaysBookings,
+      UPCOMING_BOOKING: cleanUpCommingBooking ?? null,
     };
   }
 }

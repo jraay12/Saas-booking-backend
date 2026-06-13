@@ -175,7 +175,7 @@ export class BookingRepository {
     });
   }
 
-   async getTodayScheduleBookingsByStaff(business_id: string, staff_id: string) {
+  async getTodayScheduleBookingsByStaff(business_id: string, staff_id: string) {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
 
@@ -193,6 +193,51 @@ export class BookingRepository {
         },
       },
       take: 5,
+      orderBy: {
+        start_time: "asc",
+      },
+      include: {
+        service: {
+          select: {
+            service_name: true,
+            hour: true,
+            minute: true,
+          },
+        },
+        staff: {
+          select: {
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+    });
+  }
+
+  async upcomingBooking(business_id: string, staff_id: string) {
+    const now = new Date();
+
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const currentTime = now.toTimeString().slice(0, 5);
+
+    return this.prisma.booking.findFirst({
+      where: {
+        business_id,
+        staff_id,
+        status: "CONFIRMED",
+        booking_date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+        start_time: {
+          gte: currentTime,
+        },
+      },
       orderBy: {
         start_time: "asc",
       },
